@@ -30,7 +30,10 @@ function Signup() {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post("http://localhost:8000/api/auth/register/", form);
+      await axios.post(
+        "https://study-mitra-backend.onrender.com/api/auth/register/",
+        form,
+      );
       navigate("/login", {
         state: { message: "Account created! Welcome to the tribe." },
       });
