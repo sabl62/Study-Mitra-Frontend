@@ -1,0 +1,173 @@
+/* Shared variables should ideally be in App.css, but including here for consistency */
+.signup-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at 100% 100%, #1a1033 0%, #0b0f1a 100%);
+    padding: 20px;
+    font-family: 'Inter', sans-serif;
+}
+
+.signup-card {
+    display: flex;
+    flex-direction: row-reverse;
+    /* Reverses the side of the image vs Login */
+    width: 100%;
+    max-width: 1000px;
+    background: rgba(17, 22, 42, 0.8);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* --- Form Side --- */
+.signup-form-section {
+    flex: 1.2;
+    padding: 40px 60px;
+    background: #11162a;
+}
+
+.signup-grid-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.full-width {
+    grid-column: span 2;
+}
+
+.form-header h2 {
+    font-size: 2rem;
+    color: white;
+    margin-bottom: 5px;
+}
+
+.form-header p {
+    color: #b6b9d6;
+    margin-bottom: 25px;
+}
+
+.input-group label {
+    display: block;
+    font-size: 0.85rem;
+    color: #b6b9d6;
+    margin-bottom: 6px;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 14px;
+    color: #64748b;
+}
+
+.signup-form-section input {
+    width: 100%;
+    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    color: white;
+    font-size: 0.95rem;
+    transition: all 0.3s;
+}
+
+/* Add padding for fields with icons */
+.full-width .input-wrapper input {
+    padding-left: 42px;
+}
+
+.signup-form-section input:focus {
+    border-color: #8b5cf6;
+    background: rgba(255, 255, 255, 0.08);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.signup-btn {
+    grid-column: span 2;
+    padding: 14px;
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: 0.3s;
+}
+
+.signup-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
+}
+
+/* --- Visual Side --- */
+.signup-visual {
+    flex: 0.8;
+    background: linear-gradient(225deg, #4c1d95 0%, #1e1b4b 100%);
+    padding: 60px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    color: white;
+}
+
+.feature-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 30px;
+}
+
+.feature-list li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 15px;
+    color: #ddd6fe;
+    font-size: 1rem;
+}
+
+.check-icon {
+    color: #10b981;
+}
+
+.quote {
+    font-style: italic;
+    font-size: 0.9rem;
+    opacity: 0.7;
+    border-left: 2px solid #8b5cf6;
+    padding-left: 15px;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 850px) {
+    .signup-visual {
+        display: none;
+    }
+
+    .signup-grid-form {
+        grid-template-columns: 1fr;
+    }
+
+    .full-width {
+        grid-column: span 1;
+    }
+
+    .signup-form-section {
+        padding: 40px;
+    }
+}

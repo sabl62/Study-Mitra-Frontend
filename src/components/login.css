@@ -1,0 +1,211 @@
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at 0% 0%, #1a1033 0%, #0b0f1a 100%);
+    padding: 20px;
+    font-family: 'Inter', sans-serif;
+}
+
+.login-card {
+    display: flex;
+    width: 100%;
+    max-width: 1000px;
+    min-height: 600px;
+    background: rgba(17, 22, 42, 0.8);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* --- Visual Side --- */
+.login-visual {
+    flex: 1;
+    background: linear-gradient(135deg, #6d28d9 0%, #8b5cf6 100%);
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    color: white;
+}
+
+/* Decorative background image/pattern */
+.login-visual::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0.1;
+    background-image: url("https://www.transparenttextures.com/patterns/cubes.png");
+}
+
+.brand-badge {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 6px 12px;
+    border-radius: 100px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 24px;
+}
+
+.login-visual h1 {
+    font-size: 2.8rem;
+    line-height: 1.1;
+    font-weight: 800;
+}
+
+.login-visual h1 span {
+    color: #c4b5fd;
+}
+
+.login-visual p {
+    margin-top: 20px;
+    color: #ddd6fe;
+    font-size: 1.1rem;
+    max-width: 320px;
+}
+
+.visual-footer {
+    display: flex;
+    gap: 40px;
+}
+
+.mini-stat strong {
+    font-size: 1.5rem;
+    display: block;
+}
+
+.mini-stat span {
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+/* --- Form Side --- */
+.login-form-section {
+    flex: 1;
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: #11162a;
+}
+
+.form-header h2 {
+    font-size: 2rem;
+    margin-bottom: 8px;
+    color: white;
+}
+
+.form-header p {
+    color: #b6b9d6;
+    margin-bottom: 32px;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    font-size: 0.85rem;
+    color: #b6b9d6;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 16px;
+    color: #64748b;
+}
+
+.login-form-section input {
+    width: 100%;
+    padding: 14px 16px 14px 48px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.login-form-section input:focus {
+    border-color: #8b5cf6;
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15);
+    outline: none;
+}
+
+.error-toast {
+    background: rgba(239, 68, 68, 0.1);
+    color: #f87171;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.login-btn {
+    width: 100%;
+    padding: 14px;
+    background: #8b5cf6;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 10px;
+}
+
+.login-btn:hover {
+    background: #7c3aed;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px -5px rgba(139, 92, 246, 0.5);
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 32px;
+    color: #b6b9d6;
+    font-size: 0.9rem;
+}
+
+.auth-footer a {
+    color: #8b5cf6;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .login-visual {
+        display: none;
+    }
+
+    .login-card {
+        max-width: 450px;
+    }
+}

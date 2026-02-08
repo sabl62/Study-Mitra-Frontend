@@ -1,0 +1,80 @@
+/* Layout Container */
+.main-layout {
+    display: flex;
+    flex: 1;
+    height: calc(100vh - 80px);
+    /* Total height minus navbar height */
+    overflow: hidden;
+    /* Prevent the layout itself from scrolling */
+}
+
+.content-area {
+    flex: 1;
+    overflow-y: auto;
+    /* This makes your posts scrollable! */
+    background-color: var(--bg-color);
+}
+
+/* Sidebar Styling */
+.sidebar {
+    width: 280px;
+    background: rgba(5, 7, 10, 0.4);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    backdrop-filter: blur(10px);
+}
+
+.sidebar-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.2rem;
+    text-decoration: none;
+    color: var(--text-dim);
+    border-radius: 14px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.nav-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+    transform: translateX(5px);
+}
+
+.nav-item.active {
+    background: rgba(99, 102, 241, 0.1);
+    color: var(--accent-blue);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.nav-item .icon {
+    font-size: 1.2rem;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 80px;
+    }
+
+    .nav-item .label {
+        display: none;
+        /* Hide text on small screens */
+    }
+
+    .sidebar {
+        padding: 2rem 0.5rem;
+        align-items: center;
+    }
+}

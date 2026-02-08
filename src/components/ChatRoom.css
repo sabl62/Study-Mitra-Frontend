@@ -1,0 +1,612 @@
+/* ChatRoom.css */
+:root {
+    --bg-main: #0f172a;
+    --bg-card: #1e293b;
+    --bg-hover: #334155;
+    --accent-primary: #6366f1;
+    --accent-secondary: #a855f7;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --glass: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --grad-linear: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    --success: #22c55e;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    overflow: hidden;
+}
+
+/* Main Container - Fixed Grid Layout */
+.chat-container {
+    display: grid;
+    grid-template-areas:
+        "header header"
+        "content notes";
+    grid-template-columns: 1fr 0;
+    grid-template-rows: 70px calc(100vh - 70px);
+    height: 100vh;
+    overflow: hidden;
+    transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* When notes panel is open */
+.chat-container.notes-open {
+    grid-template-columns: 1fr 400px;
+}
+
+/* Header Styling */
+.chat-header {
+    grid-area: header;
+    background: var(--glass);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--glass-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    z-index: 100;
+}
+
+.session-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.session-info h2 {
+    font-size: 1.2rem;
+    margin: 0;
+    background: var(--grad-linear);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.status-badge {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background: rgba(34, 197, 94, 0.2);
+    color: var(--success);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.header-actions {
+    display: flex;
+    gap: 12px;
+}
+
+/* Button Styles */
+button {
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 10px 18px;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.notes-btn {
+    background: var(--glass);
+    color: var(--text-primary);
+    border: 1px solid var(--glass-border);
+}
+
+.notes-btn:hover:not(:disabled) {
+    background: var(--glass-border);
+    transform: translateY(-1px);
+}
+
+.notes-btn.active {
+    background: var(--accent-primary);
+    color: white;
+    border-color: var(--accent-primary);
+}
+
+.end-btn {
+    background: var(--danger);
+    color: white;
+}
+
+.end-btn:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+}
+
+/* Error Alert */
+.error-alert {
+    position: fixed;
+    top: 90px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(239, 68, 68, 0.95);
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    max-width: 500px;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+.error-close {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+}
+
+/* Main Content Area (Messages + Input) */
+.chat-main-content {
+    grid-area: content;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* Message Log Area */
+.messages-log {
+    flex: 1;
+    padding: 2rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    scroll-behavior: smooth;
+}
+
+/* Empty State */
+.messages-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-muted);
+}
+
+.messages-empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.messages-empty p {
+    font-size: 1.1rem;
+}
+
+/* Message Bubbles */
+.message-item {
+    display: flex;
+    flex-direction: column;
+    animation: messageSlideIn 0.3s ease;
+}
+
+@keyframes messageSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.message-bubble {
+    max-width: 70%;
+    width: fit-content;
+    padding: 14px 18px;
+    position: relative;
+    background: var(--bg-card);
+    border-radius: 18px 18px 18px 4px;
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+}
+
+.message-bubble:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transform: translateY(-1px);
+}
+
+.sender-name {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--accent-secondary);
+    margin-bottom: 6px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.message-text {
+    margin: 0 0 8px 0;
+    line-height: 1.6;
+    font-size: 0.95rem;
+    word-wrap: break-word;
+}
+
+.message-time {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-align: right;
+}
+
+/* Message Input Form */
+.message-form {
+    padding: 1.5rem 2rem;
+    display: flex;
+    gap: 12px;
+    background: var(--bg-main);
+    border-top: 1px solid var(--glass-border);
+}
+
+.message-form input {
+    flex: 1;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 0 20px;
+    color: white;
+    outline: none;
+    font-size: 0.95rem;
+    height: 48px;
+}
+
+.message-form input::placeholder {
+    color: var(--text-muted);
+}
+
+.message-form input:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.message-form input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.message-form button {
+    background: var(--grad-linear);
+    color: white;
+    padding: 0 32px;
+    height: 48px;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.message-form button:hover:not(:disabled) {
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+    transform: translateY(-2px);
+}
+
+/* Notes Panel (Side Drawer) */
+.notes-panel {
+    grid-area: notes;
+    background: var(--bg-card);
+    border-left: 1px solid var(--glass-border);
+    overflow-y: auto;
+    width: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.notes-panel.active {
+    width: 400px;
+    opacity: 1;
+    visibility: visible;
+}
+
+.notes-panel-header {
+    padding: 1.5rem;
+    position: sticky;
+    top: 0;
+    background: var(--bg-card);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--glass-border);
+    z-index: 10;
+}
+
+.notes-panel-header h3 {
+    font-size: 1.1rem;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.notes-panel-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.notes-refresh-btn,
+.notes-close-btn {
+    background: transparent;
+    color: var(--text-secondary);
+    padding: 6px 10px;
+    font-size: 1.2rem;
+    border-radius: 6px;
+}
+
+.notes-refresh-btn:hover:not(:disabled),
+.notes-close-btn:hover {
+    background: var(--glass);
+    color: var(--text-primary);
+}
+
+.notes-panel-content {
+    padding: 1rem;
+}
+
+/* Empty Notes State */
+.notes-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    text-align: center;
+    color: var(--text-muted);
+}
+
+.notes-empty-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.notes-empty p {
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+/* Note Cards */
+.note-card {
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    background: var(--glass);
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    animation: noteSlideIn 0.3s ease;
+}
+
+@keyframes noteSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.note-timestamp {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    text-align: right;
+}
+
+.note-section {
+    margin-top: 1.5rem;
+}
+
+.note-section:first-child {
+    margin-top: 0;
+}
+
+.note-section-title {
+    color: var(--accent-secondary);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.note-section-content {
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+.note-section-content p {
+    margin: 0;
+}
+
+.note-section-content ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+.note-section-content li {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.note-section-content li:last-child {
+    border-bottom: none;
+}
+
+.note-definition-term {
+    color: var(--accent-primary);
+    font-weight: 600;
+}
+
+/* Loading State */
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+}
+
+.error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    font-size: 1.2rem;
+    color: var(--danger);
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--glass-border);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .chat-container.notes-open {
+        grid-template-columns: 1fr 350px;
+    }
+
+    .notes-panel.active {
+        width: 350px;
+    }
+}
+
+@media (max-width: 768px) {
+    .chat-header {
+        padding: 0 1rem;
+    }
+
+    .session-info h2 {
+        font-size: 1rem;
+    }
+
+    .header-actions {
+        gap: 8px;
+    }
+
+    button {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+    }
+
+    .notes-panel.active {
+        position: fixed;
+        right: 0;
+        top: 70px;
+        bottom: 0;
+        z-index: 999;
+        width: 100%;
+        max-width: 100vw;
+    }
+
+    .chat-container.notes-open {
+        grid-template-columns: 1fr 0;
+    }
+
+    .message-bubble {
+        max-width: 85%;
+    }
+
+    .messages-log {
+        padding: 1rem;
+    }
+
+    .message-form {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-actions button span {
+        display: none;
+    }
+
+    .notes-btn::before {
+        content: "📝";
+    }
+
+    .session-info h2 {
+        font-size: 0.9rem;
+    }
+
+    .status-badge {
+        font-size: 0.65rem;
+        padding: 3px 8px;
+    }
+}

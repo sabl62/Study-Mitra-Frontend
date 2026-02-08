@@ -1,0 +1,126 @@
+/* --- Global Reset --- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: #05070a;
+  color: #ffffff;
+  overflow: hidden;
+  /* Prevents double scrollbars on the window */
+}
+
+.App {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- Navbar --- */
+.app-navbar {
+  height: 70px;
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(5, 7, 10, 0.8);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  z-index: 1000;
+}
+
+.logo {
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+}
+
+.logout-button {
+  padding: 0.6rem 1.2rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.logout-button:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+/* --- Layout Structure --- */
+.main-layout {
+  display: flex;
+  flex: 1;
+  /* Takes up remaining height below navbar */
+  overflow: hidden;
+  /* Contains the children */
+}
+
+.content-area {
+  flex: 1;
+  overflow-y: auto;
+  /* THIS FIXES YOUR SCROLLING */
+  height: 100%;
+  background: #05070a;
+}
+
+/* --- Navbar Layout Fix --- */
+.app-navbar {
+  height: 70px;
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* Distributes the three sections */
+  background: rgba(5, 7, 10, 0.8);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+/* Ensure Left and Right take equal space to keep Center in the middle */
+.nav-left,
+.nav-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.nav-right {
+  justify-content: flex-end;
+}
+
+.nav-center {
+  flex: 2;
+  /* Gives the middle more breathing room */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* --- Username Styling --- */
+.welcome-text {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: var(--text-dim, #94a3b8);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.user-highlight {
+  color: #ffffff;
+  font-weight: 700;
+  margin-left: 4px;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
