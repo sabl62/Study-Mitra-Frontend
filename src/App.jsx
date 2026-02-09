@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -17,6 +17,8 @@ import Profile from "./components/Profile";
 import ExamPrep from "./components/ExamPrep.jsx";
 // Auth Context
 import { useAuth, AuthProvider } from "./context/AuthContext.jsx";
+// API
+import { authAPI } from "./services/api";
 
 // Styles
 import "./App.css";
@@ -31,6 +33,7 @@ const ProfileViewWrapper = () => {
 
   return <Profile username={username} isOwnProfile={isMe} />;
 };
+
 /**
  * A clean ProtectedRoute using the global Auth state
  */
@@ -44,7 +47,48 @@ const ProtectedRoute = ({ children }) => {
 
 function AppContent() {
   // Pull reactive state directly from Context
-  const { user, isLoggedIn, logout } = useAuth();
+  const { user, isLoggedIn, logout, loading, setIsLoggedIn, setUser } =
+    useAuth();
+  const [isValidating, setIsValidating] = useState(true);
+
+  // Validate authentication on app startup
+  useEffect(() => {
+    const validateSession = async () => {
+      // Only validate if tokens exist
+      if (authAPI.isAuthenticated()) {
+        try {
+          const isValid = await authAPI.validateAuth();
+
+          if (isValid) {
+            // Refresh user data from localStorage
+            const currentUser = authAPI.getCurrentUser();
+            if (currentUser && !user) {
+              setUser(currentUser);
+              setIsLoggedIn(true);
+            }
+          } else {
+            // Validation failed, logout
+            logout();
+          }
+        } catch (error) {
+          console.error("Session validation failed:", error);
+          logout();
+        }
+      }
+      setIsValidating(false);
+    };
+
+    validateSession();
+  }, []); // Run only once on mount
+
+  // Show loading screen during initial validation
+  if (isValidating || loading) {
+    return (
+      <div className="loading-screen">
+        <div>Loading Study Mitra...</div>
+      </div>
+    );
+  }
 
   return (
     <Router>
