@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import api from "../services/api";
 import ReactMarkdown from "react-markdown";
 import "./MicroChallenges.css";
@@ -9,108 +9,161 @@ const MicroChallenges = () => {
   const [content, setContent] = useState("");
   const [activeType, setActiveType] = useState(null);
   const [feedback, setFeedback] = useState(null);
+  const [previousQuestions, setPreviousQuestions] = useState([]);
 
-  const challengeTypes = [
-    { id: "quiz", label: "Knowledge Quiz", icon: "🧠", color: "#38bdf8" },
-    { id: "iq", label: "Logic Puzzle", icon: "🧩", color: "#a29bfe" },
-    { id: "fact", label: "Mind Blow", icon: "✨", color: "#64ffda" },
-  ];
+  const challengeTypes = useMemo(
+    () => [
+      { id: "quiz", label: "Knowledge Quiz", icon: "🧠", color: "#38bdf8" },
+      { id: "iq", label: "Logic Puzzle", icon: "🧩", color: "#a29bfe" },
+      { id: "fact", label: "Mind Blow", icon: "✨", color: "#64ffda" },
+    ],
+    [],
+  );
 
   const generateChallenge = useCallback(
     async (type) => {
-      if (!topic) return;
+      if (!topic || loading) return;
+
       setLoading(true);
       setActiveType(type.id);
       setFeedback(null);
       setContent("");
 
       const prompts = {
-        quiz: `Subject: ${topic}. Create a complex MCQ. Format: **Question** on first line(s), then options A, B, C, D each on separate lines starting with the letter.`,
-        iq: `Subject: ${topic}. Create a logic puzzle. Format: **Puzzle text** on first line(s), then options A, B, C each on separate lines starting with the letter.`,
-        fact: `Subject: ${topic}. Give one mind-blowing fact with a **Bold Title** and a 2-sentence explanation.`,
+        quiz: `Subject: ${topic}. Create a unique, complex multiple-choice question. ${previousQuestions.length > 0 ? `Avoid these topics: ${previousQuestions.join(", ")}. ` : ""}Format: **Question** on first line(s), then options A, B, C, D each on separate lines starting with the letter (e.g., "A. Option text").`,
+        iq: `Subject: ${topic}. Create a unique logic puzzle or riddle. ${previousQuestions.length > 0 ? `Avoid these topics: ${previousQuestions.join(", ")}. ` : ""}Format: **Puzzle text** on first line(s), then options A, B, C each on separate lines starting with the letter (e.g., "A. Option text").`,
+        fact: `Subject: ${topic}. Share one fascinating, mind-blowing fact with a **Bold Title** and a 2-3 sentence explanation. Make it unique and interesting.`,
       };
 
       try {
         const res = await api.post("/exam-prep/solve/", {
           question: prompts[type.id],
         });
-        setContent(res.data.answer || res.data.content);
+
+        const newContent = res.data.answer || res.data.content;
+        setContent(newContent);
+
+        // Track question to avoid repetition (store first 50 chars as identifier)
+        if (type.id !== "fact") {
+          setPreviousQuestions((prev) => {
+            const identifier = newContent.substring(0, 50);
+            const updated = [...prev, identifier];
+            // Keep only last 5 questions to avoid memory bloat
+            return updated.slice(-5);
+          });
+        }
       } catch (e) {
-        setContent("Neural link failed.");
+        setContent("⚠️ Neural link failed. Please try again.");
       } finally {
         setLoading(false);
       }
     },
-    [topic],
+    [topic, loading, previousQuestions],
   );
 
   const verifyAnswer = useCallback(
     async (choice) => {
+      if (loading) return;
+
       setLoading(true);
       try {
         const res = await api.post("/exam-prep/solve/", {
-          question: `Original Question: ${content}. User chose ${choice}. Explain the answer. Do not repeat the question. Start with CORRECT or INCORRECT.`,
+          question: `
+              You are an answer validator.
+
+              Return your response in EXACTLY this format:
+
+              VERDICT: CORRECT or INCORRECT
+
+              CORRECT ANSWER: [The correct option letter, e.g., A] with a short and sweet explanation (1-2 sentences).
+
+              EXPLANATION:
+              - Line 1 explanation
+              - Line 2 explanation
+              - Line 3 explanation (if needed)
+
+              Rules:
+              - Each point MUST be on a new line
+              - Use short sentences
+              - Max 4 lines
+              -Include bold texts where relevant
+              
+              Rules:
+              - Decide the correct option first.
+              - Do NOT change your verdict later.
+              - Do NOT include both words CORRECT and INCORRECT anywhere.
+              - Do NOT explain your reasoning process.
+              - Only explain the final result.
+
+              Question and options:
+              ${content}
+
+              User selected option: ${choice}
+            `,
         });
-        setFeedback(res.data.answer);
+        setFeedback(res.data.answer || res.data.content);
+      } catch (e) {
+        setFeedback("⚠️ Unable to verify answer. Please try again.");
       } finally {
         setLoading(false);
       }
     },
-    [content],
+    [content, loading],
   );
 
-  // Extract only the question part (before options A, B, C, D)
-  const getQuestionText = (fullContent) => {
-    if (!fullContent) return "";
+  // Optimized text extraction with memoization
+  const parsedContent = useMemo(() => {
+    if (!content) return { question: "", options: {} };
 
-    // Split by common option patterns
-    const optionPatterns = [
-      /\n\s*[A-D][\.\):\s]/, // Matches "A." or "A)" or "A:"
-      /\n\s*\*\*[A-D][\.\):\s]/, // Matches "**A."
-    ];
+    // Extract question (everything before first option)
+    const optionPattern = /\n\s*\*?\*?[A-D][\.\):\s]/;
+    const match = content.search(optionPattern);
+    const question =
+      match !== -1 ? content.substring(0, match).trim() : content;
 
-    for (let pattern of optionPatterns) {
-      const match = fullContent.search(pattern);
-      if (match !== -1) {
-        return fullContent.substring(0, match).trim();
+    // Extract all options
+    const options = {};
+    const letters =
+      activeType === "quiz" ? ["A", "B", "C", "D"] : ["A", "B", "C"];
+
+    letters.forEach((letter) => {
+      const regex = new RegExp(
+        `\\n\\s*\\*?\\*?${letter}[\\.\\):\\s]\\*?\\*?\\s*(.+?)(?=\\n\\s*\\*?\\*?[A-D][\\.\\):\\s]|$)`,
+        "s",
+      );
+      const optionMatch = content.match(regex);
+
+      if (optionMatch && optionMatch[1]) {
+        let text = optionMatch[1]
+          .trim()
+          .replace(/\*\*/g, "")
+          .replace(/\n/g, " ")
+          .trim();
+
+        options[letter] = {
+          full: text,
+          short: text.length > 80 ? text.substring(0, 80) + "..." : text,
+        };
+      } else {
+        options[letter] = {
+          full: `Option ${letter}`,
+          short: `Option ${letter}`,
+        };
       }
-    }
+    });
 
-    return fullContent; // Return full content if no options found (for fact type)
-  };
+    return { question, options };
+  }, [content, activeType]);
 
-  // Extract option text for a specific letter (A, B, C, or D)
-  const getOptionText = (fullContent, letter) => {
-    if (!fullContent)
-      return { short: `Option ${letter}`, full: `Option ${letter}` };
+  const currentChallengeType = useMemo(
+    () => challengeTypes.find((t) => t.id === activeType),
+    [activeType, challengeTypes],
+  );
 
-    // Pattern to match the option with the given letter
-    const optionPattern = new RegExp(
-      `\\n\\s*\\*?\\*?${letter}[\\.\\):\\s]\\*?\\*?\\s*(.+?)(?=\\n\\s*\\*?\\*?[A-D][\\.\\):\\s]|$)`,
-      "s",
-    );
-
-    const match = fullContent.match(optionPattern);
-    if (match && match[1]) {
-      // Clean up the text - remove extra asterisks and trim
-      let optionText = match[1].trim();
-      optionText = optionText.replace(/\*\*/g, ""); // Remove markdown bold
-      optionText = optionText.replace(/\n/g, " "); // Replace newlines with spaces
-      optionText = optionText.trim();
-
-      const fullText = optionText;
-
-      // Create truncated version for display (first 80 characters)
-      let shortText = optionText;
-      if (optionText.length > 80) {
-        shortText = optionText.substring(0, 80) + "...";
-      }
-
-      return { short: shortText, full: fullText };
-    }
-
-    return { short: `Option ${letter}`, full: `Option ${letter}` };
-  };
+const isCorrectAnswer = useMemo(() => {
+  if (!feedback) return null;
+  return feedback.startsWith("VERDICT: CORRECT");
+}, [feedback]);
 
   return (
     <div className="lab-container">
@@ -134,6 +187,7 @@ const MicroChallenges = () => {
               placeholder="Enter your subject to begin the journey..."
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
+              disabled={loading}
             />
             <div className="input-underline"></div>
           </div>
@@ -147,6 +201,7 @@ const MicroChallenges = () => {
               onClick={() => generateChallenge(t)}
               style={{ "--accent": t.color }}
               disabled={!topic || loading}
+              aria-label={`Generate ${t.label}`}
             >
               <span className="pill-icon">{t.icon}</span>
               <span className="pill-text">{t.label}</span>
@@ -166,78 +221,15 @@ const MicroChallenges = () => {
                   <div className="loader-center"></div>
                 </div>
                 <p className="loader-text">
-                  <span
-                    className="loader-letter"
-                    style={{ animationDelay: "0s" }}
-                  >
-                    A
-                  </span>
-                  <span
-                    className="loader-letter"
-                    style={{ animationDelay: "0.1s" }}
-                  >
-                    N
-                  </span>
-                  <span
-                    className="loader-letter"
-                    style={{ animationDelay: "0.2s" }}
-                  >
-                    A
-                  </span>
-                  <span
-                    className="loader-letter"
-                    style={{ animationDelay: "0.3s" }}
-                  >
-                    L
-                  </span>
-                  <span
-                    className="loader-letter"
-                    style={{ animationDelay: "0.4s" }}
-                  >
-                    Y
-                  </span>
-                  <span
-                    className="loader-letter"
-                    style={{ animationDelay: "0.5s" }}
-                  >
-                    Z
-                  </span>
-                  <span
-                    className="loader-letter"
-                    style={{ animationDelay: "0.6s" }}
-                  >
-                    I
-                  </span>
-                  <span
-                    className="loader-letter"
-                    style={{ animationDelay: "0.7s" }}
-                  >
-                    N
-                  </span>
-                  <span
-                    className="loader-letter"
-                    style={{ animationDelay: "0.8s" }}
-                  >
-                    G
-                  </span>
-                  <span
-                    className="loader-dot"
-                    style={{ animationDelay: "0.9s" }}
-                  >
-                    .
-                  </span>
-                  <span
-                    className="loader-dot"
-                    style={{ animationDelay: "1.0s" }}
-                  >
-                    .
-                  </span>
-                  <span
-                    className="loader-dot"
-                    style={{ animationDelay: "1.1s" }}
-                  >
-                    .
-                  </span>
+                  {"ANALYZING...".split("").map((char, i) => (
+                    <span
+                      key={i}
+                      className={char === "." ? "loader-dot" : "loader-letter"}
+                      style={{ animationDelay: `${i * 0.1}s` }}
+                    >
+                      {char}
+                    </span>
+                  ))}
                 </p>
               </div>
             </div>
@@ -250,19 +242,17 @@ const MicroChallenges = () => {
                       <span
                         className="challenge-badge"
                         style={{
-                          background: challengeTypes.find(
-                            (t) => t.id === activeType,
-                          )?.color,
+                          background: currentChallengeType?.color,
                         }}
                       >
-                        {challengeTypes.find((t) => t.id === activeType)?.icon}
+                        {currentChallengeType?.icon}
                       </span>
                       <span className="challenge-type">
-                        {challengeTypes.find((t) => t.id === activeType)?.label}
+                        {currentChallengeType?.label}
                       </span>
                     </div>
                     <div className="question-block">
-                      <ReactMarkdown>{getQuestionText(content)}</ReactMarkdown>
+                      <ReactMarkdown>{parsedContent.question}</ReactMarkdown>
                     </div>
                   </div>
 
@@ -270,28 +260,27 @@ const MicroChallenges = () => {
                     <div className="options-section">
                       <h3 className="options-title">Select Your Answer</h3>
                       <div className="options-grid">
-                        {["A", "B", "C", activeType === "quiz" ? "D" : null]
-                          .filter(Boolean)
-                          .map((l, idx) => {
-                            const optionData = getOptionText(content, l);
+                        {Object.entries(parsedContent.options).map(
+                          ([letter, optionData], idx) => {
                             const hasMoreText =
                               optionData.short !== optionData.full;
 
                             return (
                               <button
-                                key={l}
+                                key={letter}
                                 className="option-card"
-                                onClick={() => verifyAnswer(l)}
+                                onClick={() => verifyAnswer(letter)}
                                 style={{ animationDelay: `${idx * 0.1}s` }}
+                                aria-label={`Select option ${letter}`}
                               >
-                                <div className="option-letter">{l}</div>
+                                <div className="option-letter">{letter}</div>
                                 <div className="option-label">
                                   <span className="option-text">
                                     {optionData.short}
                                   </span>
                                   {hasMoreText && (
                                     <span className="option-more-indicator">
-                                      hover for more
+                                      hover for full text
                                     </span>
                                   )}
                                 </div>
@@ -304,7 +293,8 @@ const MicroChallenges = () => {
                                 )}
                               </button>
                             );
-                          })}
+                          },
+                        )}
                       </div>
                     </div>
                   )}
@@ -313,17 +303,13 @@ const MicroChallenges = () => {
                 <div className="feedback-layout">
                   <div className="verdict-section">
                     <div
-                      className={`verdict-ribbon ${!feedback.toUpperCase().includes("INCORRECT") ? "success" : "error"}`}
+                      className={`verdict-ribbon ${isCorrectAnswer ? "verdict-success" : "verdict-error"}`}
                     >
                       <span className="verdict-icon">
-                        {!feedback.toUpperCase().includes("INCORRECT")
-                          ? "✓"
-                          : "✗"}
+                        {isCorrectAnswer ? "✓" : "✗"}
                       </span>
                       <span className="verdict-text">
-                        {!feedback.toUpperCase().includes("INCORRECT")
-                          ? "CORRECT ANSWER"
-                          : "INCORRECT ANSWER"}
+                        {isCorrectAnswer ? "CORRECT" : "INCORRECT"}
                       </span>
                     </div>
                   </div>
@@ -336,11 +322,9 @@ const MicroChallenges = () => {
                   <div className="action-buttons">
                     <button
                       className="reset-action"
-                      onClick={() =>
-                        generateChallenge(
-                          challengeTypes.find((t) => t.id === activeType),
-                        )
-                      }
+                      onClick={() => generateChallenge(currentChallengeType)}
+                      disabled={loading}
+                      aria-label="Generate next challenge"
                     >
                       <span className="button-icon">↻</span>
                       <span>Next Challenge</span>
