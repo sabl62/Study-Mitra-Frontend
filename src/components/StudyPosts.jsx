@@ -1,20 +1,12 @@
-import React, { useState, useEffect, useCallback } from "react";
-
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { studyPostsAPI, authAPI } from "../services/api";
-
 import { useNavigate } from "react-router-dom";
-
 import "./StudyPosts.css";
-
-// Constants for initial states to keep code clean
 
 const INITIAL_POST_STATE = {
   title: "",
-
   topic: "",
-
   description: "",
-
   subject: "",
 };
 
@@ -22,58 +14,60 @@ const INITIAL_FILTERS = { subject: "", search: "", topic: "" };
 
 function StudyPosts() {
   const [posts, setPosts] = useState([]);
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState(null);
-
   const [showCreateModal, setShowCreateModal] = useState(false);
-
   const [searchInput, setSearchInput] = useState("");
-
   const [createError, setCreateError] = useState(null);
-
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const [filters, setFilters] = useState(INITIAL_FILTERS);
-
   const [newPost, setNewPost] = useState(INITIAL_POST_STATE);
 
   const navigate = useNavigate();
-
   const user = authAPI.getCurrentUser();
 
-  // Memoized fetch function to prevent unnecessary re-renders
+  // Ref to track the current abort controller for cleanup
+  const abortControllerRef = useRef(null);
 
-  const fetchPosts = useCallback(async () => {
+  const fetchPosts = useCallback(async (currentFilters) => {
+    // Cancel any ongoing request before starting a new one
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    abortControllerRef.current = new AbortController();
+
     try {
       setLoading(true);
-
-      const response = await studyPostsAPI.getAll(filters);
-
-      // Backend usually returns { results: [] } or just []
+      const response = await studyPostsAPI.getAll(currentFilters, {
+        signal: abortControllerRef.current.signal,
+      });
 
       const data = response.data.results || response.data;
-
       setPosts(Array.isArray(data) ? data : []);
-
       setError(null);
     } catch (err) {
+      if (err.name === "CanceledError" || err.name === "AbortError") return;
+
       setError(
         "Failed to sync with Study Mitra. Please check your connection.",
       );
-
       console.error("Fetch Error:", err);
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, []);
 
+  // DEBOUNCE LOGIC: Wait for user to stop typing before searching
   useEffect(() => {
-    fetchPosts();
-  }, [fetchPosts]);
+    const handler = setTimeout(() => {
+      fetchPosts(filters);
+    }, 400); // 400ms delay
 
-  // Handle Search on Enter
+    return () => {
+      clearTimeout(handler);
+      if (abortControllerRef.current) abortControllerRef.current.abort();
+    };
+  }, [filters, fetchPosts]);
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
@@ -84,67 +78,45 @@ function StudyPosts() {
   const handleJoinPost = async (postId) => {
     try {
       const response = await studyPostsAPI.join(postId);
-
       const sessionData = response.data.session || response.data;
-
-      // Navigate to the chat room created by joining
-
       navigate(`/chat/${sessionData.id}`, { state: { session: sessionData } });
     } catch (err) {
       const msg =
         err.response?.data?.error || "This session is no longer available.";
-
       alert(msg);
     }
   };
 
   const handleCreatePost = async (e) => {
     e.preventDefault();
-
     setIsSubmitting(true);
-
     setCreateError(null);
 
     try {
       const postData = {
         title: newPost.title.trim(),
-
         topic: newPost.topic.trim(),
-
         description: newPost.description.trim(),
-
         subject: newPost.subject.trim(),
       };
 
       await studyPostsAPI.create(postData);
-
-      // Success: Reset and Close
-
       setShowCreateModal(false);
-
       setNewPost(INITIAL_POST_STATE);
-
-      fetchPosts();
+      fetchPosts(filters); // Refresh current view
     } catch (err) {
-      // Robust Error Extraction
-
       const backendError = err.response?.data;
-
       let errorMessage = "Could not create post.";
-
       if (typeof backendError === "object") {
         errorMessage = Object.entries(backendError)
-
           .map(
             ([key, val]) =>
               `${key}: ${Array.isArray(val) ? val.join(", ") : val}`,
           )
-
           .join(" | ");
       } else {
         errorMessage = backendError || err.message;
       }
-
       setCreateError(errorMessage);
     } finally {
       setIsSubmitting(false);
@@ -153,31 +125,23 @@ function StudyPosts() {
 
   const handleCloseModal = () => {
     setShowCreateModal(false);
-
     setCreateError(null);
-
     setNewPost(INITIAL_POST_STATE);
   };
-
-  // Loading State
 
   if (loading && posts.length === 0) {
     return (
       <div className="loading-container">
         <div className="spinner"></div>
-
       </div>
     );
   }
 
   return (
     <div className="study-posts-container">
-      {/* HEADER */}
-
       <header className="header-section">
         <div className="title-group">
           <h1>Study Mitra</h1>
-
           <p>Collaborate, Learn, and Succeed together.</p>
         </div>
 
@@ -190,8 +154,6 @@ function StudyPosts() {
           </button>
         )}
       </header>
-
-      {/* SEARCH & FILTERS */}
 
       <div className="filter-bar">
         <div className="input-wrapper search-main">
@@ -220,17 +182,16 @@ function StudyPosts() {
 
       {error && <div className="error-pill banner-error">{error}</div>}
 
-      {/* POSTS LIST */}
-
       <main className="posts-list">
         {posts.length === 0 ? (
           <div className="no-posts-state">
             <div className="empty-icon">📚</div>
-
             <p>No study sessions found for your search.</p>
-
             <button
-              onClick={() => setFilters(INITIAL_FILTERS)}
+              onClick={() => {
+                setSearchInput("");
+                setFilters(INITIAL_FILTERS);
+              }}
               className="text-link"
             >
               Clear all filters
@@ -243,14 +204,11 @@ function StudyPosts() {
                 <div className="avatar-squircle">
                   {post.user?.username?.charAt(0).toUpperCase() || "?"}
                 </div>
-
                 <div className="user-details">
                   <h3>{post.user?.username || "Anonymous"}</h3>
-
                   <span className="date-label">
                     {new Date(post.created_at).toLocaleDateString(undefined, {
                       month: "short",
-
                       day: "numeric",
                     })}
                   </span>
@@ -260,14 +218,11 @@ function StudyPosts() {
               <div className="content-section">
                 <div className="tag-row">
                   <span className="subject-tag">{post.subject}</span>
-
                   {post.topic && (
                     <span className="topic-badge">{post.topic}</span>
                   )}
                 </div>
-
                 <h2>{post.title}</h2>
-
                 <p className="description-text">{post.description}</p>
               </div>
 
@@ -281,7 +236,6 @@ function StudyPosts() {
                     <span className="idle-badge">Be the first to join</span>
                   )}
                 </div>
-
                 <button
                   className="join-action-btn"
                   onClick={() => handleJoinPost(post.id)}
@@ -294,14 +248,11 @@ function StudyPosts() {
         )}
       </main>
 
-      {/* CREATE POST MODAL */}
-
       {showCreateModal && (
         <div className="modal-overlay" onClick={handleCloseModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2>Launch a Study Session</h2>
-
               <button className="close-btn" onClick={handleCloseModal}>
                 &times;
               </button>
@@ -314,7 +265,6 @@ function StudyPosts() {
             <form onSubmit={handleCreatePost} className="modern-form">
               <div className="form-group">
                 <label>Title</label>
-
                 <input
                   required
                   value={newPost.title}
@@ -329,7 +279,6 @@ function StudyPosts() {
               <div className="form-row">
                 <div className="form-group">
                   <label>Subject</label>
-
                   <input
                     required
                     value={newPost.subject}
@@ -340,10 +289,8 @@ function StudyPosts() {
                     disabled={isSubmitting}
                   />
                 </div>
-
                 <div className="form-group">
                   <label>Topic</label>
-
                   <input
                     required
                     value={newPost.topic}
@@ -358,7 +305,6 @@ function StudyPosts() {
 
               <div className="form-group">
                 <label>Description</label>
-
                 <textarea
                   required
                   value={newPost.description}
@@ -380,7 +326,6 @@ function StudyPosts() {
                 >
                   Cancel
                 </button>
-
                 <button
                   type="submit"
                   className="submit-btn"

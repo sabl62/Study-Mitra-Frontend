@@ -28,18 +28,24 @@ const ChatRoom = () => {
 
   const messagesEndRef = useRef(null);
   const pollingTimerRef = useRef(null);
-  const notesCountRef = useRef(0); // Tracks count for polling comparison
+  const notesCountRef = useRef(0);
+
+  // Get current user info to check for creator status
+  const userJson = localStorage.getItem("user");
+  const currentUser = userJson ? JSON.parse(userJson) : null;
+  // Check if current user is the session creator
+  const isCreator =
+    session?.creator === currentUser?.id ||
+    session?.creator?.id === currentUser?.id;
 
   const scrollToBottom = useCallback((behavior = "smooth") => {
     if (messagesEndRef.current) {
-      // requestAnimationFrame ensures the DOM has updated before scrolling
       window.requestAnimationFrame(() => {
         messagesEndRef.current?.scrollIntoView({ behavior });
       });
     }
   }, []);
 
-  // Sync ref with state
   useEffect(() => {
     notesCountRef.current = notes.length;
   }, [notes]);
@@ -63,7 +69,7 @@ const ChatRoom = () => {
           setNotes(initialNotes);
         }
       } catch (err) {
-        // Silent fail for non-critical session fetch
+        // Silent fail
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -99,42 +105,43 @@ const ChatRoom = () => {
         scrollToBottom();
       },
       (err) => {
-        // Handle snapshot error silently
+        // Handle error
       },
     );
 
     return () => unsubscribe();
   }, [session?.firestore_chat_id, scrollToBottom]);
 
-  useEffect(() => {
+  // Handle leaving the session (either via button or navigation)
+  const handleLeaveSession = useCallback(
+    async (shouldNavigate = true) => {
+      try {
+        await api.post(`/sessions/${sessionId}/leave/`);
+        if (shouldNavigate) navigate("/dashboard");
+      } catch (err) {
+        console.error("Error leaving session:", err);
+        if (shouldNavigate) navigate("/dashboard");
+      }
+    },
+    [sessionId, navigate],
+  );
 
+  // Cleanup/Leave on Unmount or Page Close
+  useEffect(() => {
     const notifyLeave = () => {
-
-      const url = `${import.meta.env.VITE_API_URL}/sessions/${sessionId}/leave/` || `http://localhost:8000/api/sessions/${sessionId}/leave/`;
+      const url = `${import.meta.env.VITE_API_URL || "http://localhost:8000/api"}/sessions/${sessionId}/leave/`;
+      // Use sendBeacon for more reliable delivery during page close
       navigator.sendBeacon(url);
-
-
-      api.post(`/sessions/${sessionId}/leave/`).catch(() => {});
     };
 
+    window.addEventListener("beforeunload", notifyLeave);
 
     return () => {
-      notifyLeave();
+      window.removeEventListener("beforeunload", notifyLeave);
+      // Call leave when component unmounts (e.g., navigating to other sections of the site)
+      handleLeaveSession(false);
     };
-  }, [sessionId]);
-
-  useEffect(() => {
-    const handleBackButton = () => {
-      api.post(`/sessions/${sessionId}/leave/`);
-    };
-
-    window.addEventListener("popstate", handleBackButton);
-    return () => {
-      window.removeEventListener("popstate", handleBackButton);
-      // Trigger leave on unmount too
-      api.post(`/sessions/${sessionId}/leave/`).catch(() => {});
-    };
-  }, [sessionId]);
+  }, [sessionId, handleLeaveSession]);
 
   const fetchNotes = async () => {
     try {
@@ -152,12 +159,11 @@ const ChatRoom = () => {
     }
   };
 
-  // Production-grade Polling (Prevents request stacking)
   const startPollingNotes = useCallback(() => {
     if (pollingTimerRef.current) clearTimeout(pollingTimerRef.current);
 
     let pollCount = 0;
-    const maxPolls = 20; // 40 seconds total
+    const maxPolls = 20;
 
     const poll = async () => {
       pollCount++;
@@ -182,7 +188,6 @@ const ChatRoom = () => {
     poll();
   }, [sessionId]);
 
-  // Clean up timers on unmount
   useEffect(() => {
     return () => {
       if (pollingTimerRef.current) clearTimeout(pollingTimerRef.current);
@@ -196,12 +201,9 @@ const ChatRoom = () => {
     if (isSending || !messageContent || !session?.firestore_chat_id) return;
 
     setIsSending(true);
-    setNewMessage(""); // Optimistic UI: clear immediately
+    setNewMessage("");
 
     try {
-      const userJson = localStorage.getItem("user");
-      const storedUser = userJson ? JSON.parse(userJson) : null;
-
       const messagesRef = collection(
         db,
         "studySessions",
@@ -211,12 +213,12 @@ const ChatRoom = () => {
 
       await addDoc(messagesRef, {
         text: messageContent,
-        senderId: storedUser?.id || "guest",
-        senderName: storedUser?.username || "Anonymous",
+        senderId: currentUser?.id || "guest",
+        senderName: currentUser?.username || "Anonymous",
         timestamp: serverTimestamp(),
       });
     } catch (err) {
-      setNewMessage(messageContent); // Revert on failure
+      setNewMessage(messageContent);
       setNotesError("Message failed to send.");
     } finally {
       setIsSending(false);
@@ -261,7 +263,12 @@ const ChatRoom = () => {
   };
 
   const handleEndSession = async () => {
-    if (!window.confirm("Are you sure you want to end this session?")) return;
+    if (
+      !window.confirm(
+        "Are you sure you want to end this session? This will end it for all participants.",
+      )
+    )
+      return;
 
     try {
       await api.post(`/sessions/${sessionId}/end_session/`);
@@ -297,9 +304,21 @@ const ChatRoom = () => {
           >
             {isGenerating ? "⏳ Processing..." : "🤖 Generate Notes"}
           </button>
-          <button onClick={handleEndSession} className="end-btn">
-            End Session
-          </button>
+
+          {/* Conditional rendering based on creator status */}
+          {isCreator ? (
+            <button onClick={handleEndSession} className="end-btn">
+              End Session
+            </button>
+          ) : (
+            <button
+              onClick={() => handleLeaveSession(true)}
+              className="end-btn"
+              style={{ backgroundColor: "#dc3545" }}
+            >
+              Leave Session
+            </button>
+          )}
         </div>
       </header>
 
@@ -441,6 +460,6 @@ const ChatRoom = () => {
       </aside>
     </div>
   );
-};;
+};
 
 export default ChatRoom;
