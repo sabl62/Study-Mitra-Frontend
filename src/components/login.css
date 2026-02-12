@@ -12,7 +12,7 @@
     display: flex;
     width: 100%;
     max-width: 1000px;
-    min-height: 600px;
+    min-height: auto;
     background: rgba(17, 22, 42, 0.8);
     backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -79,6 +79,14 @@
     gap: 40px;
 }
 
+.mobile-logo {
+    display: none;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #8b5cf6;
+    margin-bottom: 20px;
+}
+
 .mini-stat strong {
     font-size: 1.5rem;
     display: block;
@@ -124,14 +132,20 @@
 
 .input-wrapper {
     position: relative;
-    display: flex;
     align-items: center;
 }
 
 .input-icon {
     position: absolute;
     left: 16px;
+    top: 50%;
+    /* Add this to center vertically */
+    transform: translateY(-50%);
+    /* Add this to center vertically */
     color: #64748b;
+    pointer-events: none;
+    /* Ensures clicking the icon focuses the input */
+    z-index: 10;
 }
 
 .login-form-section input {
@@ -143,6 +157,7 @@
     color: white;
     font-size: 1rem;
     transition: all 0.3s;
+    padding-left: 100px;
 }
 
 .login-form-section input:focus {
@@ -207,5 +222,27 @@
 
     .login-card {
         max-width: 450px;
+    }
+}
+
+@media (max-width: 900px) {
+    .login-visual {
+        display: none;
+    }
+
+    .login-card {
+        max-width: 450px;
+        min-height: auto;
+        /* Ensure it doesn't stay stretched */
+    }
+
+    .mobile-logo {
+        display: block;
+        /* Show logo since the purple side is gone */
+    }
+
+    .login-form-section {
+        padding: 40px 30px;
+        /* Reduce padding so it doesn't feel squashed */
     }
 }

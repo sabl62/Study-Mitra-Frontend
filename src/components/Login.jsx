@@ -68,11 +68,9 @@ const Login = () => {
             </p>
           </div>
           <div className="visual-footer">
+
             <div className="mini-stat">
-              <strong>10k+</strong> <span>Users</span>
-            </div>
-            <div className="mini-stat">
-              <strong>50k+</strong> <span>Tasks Solved</span>
+              <strong>Quantity with Quality Focused</strong> <span>All in One education platform</span>
             </div>
           </div>
         </div>
@@ -91,7 +89,6 @@ const Login = () => {
             <div className="input-group">
               <label>Username</label>
               <div className="input-wrapper">
-                <User className="input-icon" size={18} />
                 <input
                   type="text"
                   placeholder="Enter your username"
@@ -108,7 +105,6 @@ const Login = () => {
             <div className="input-group">
               <label>Password</label>
               <div className="input-wrapper">
-                <Lock className="input-icon" size={18} />
                 <input
                   type="password"
                   placeholder="••••••••"
