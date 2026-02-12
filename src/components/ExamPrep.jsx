@@ -85,7 +85,7 @@ const ExamPrep = () => {
   return (
     <div className="exam-prep-container">
       <header className="prep-header">
-        <h1>🎯 AI Exam Prep Master</h1>
+        <h1>Exam Preparation Master/ AI mentor</h1>
         <p>Click on Key Concepts to see their definitions.</p>
       </header>
 
@@ -126,6 +126,15 @@ const ExamPrep = () => {
               <option value="Advanced">Advanced</option>
             </select>
           </div>
+        </div>
+        <div className="input-group">
+          <label>Additional Remarks/Questions</label>
+          <textarea
+            name="remarks"
+            className="remarks-box"
+            placeholder="Any specific areas you want the AI to focus on?"
+            onChange={handleInputChange}
+          />
         </div>
         <button type="submit" className="generate-btn" disabled={loading}>
           {loading ? "Generating Study Plan..." : "Generate Prep Material"}
