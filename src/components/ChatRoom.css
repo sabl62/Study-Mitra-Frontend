@@ -36,7 +36,7 @@ body {
         "header header"
         "content notes";
     grid-template-columns: 1fr 0;
-    grid-template-rows: 70px calc(100vh - 70px);
+    grid-template-rows: clamp(60px, 10vh, 70px) calc(100vh - clamp(60px, 10vh, 70px));
     height: 100vh;
     overflow: hidden;
     transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -56,35 +56,46 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 2rem;
+    padding: 0 clamp(1rem, 3vw, 2rem);
     z-index: 100;
+    gap: clamp(0.5rem, 2vw, 1rem);
+    flex-wrap: wrap;
+    min-height: clamp(60px, 10vh, 70px);
 }
 
 .session-info {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: clamp(0.75rem, 2vw, 1rem);
+    flex: 1;
+    min-width: 0;
 }
 
 .session-info h2 {
-    font-size: 1.2rem;
+    font-size: clamp(1rem, 2.5vw, 1.2rem);
     margin: 0;
     background: var(--grad-linear);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 700;
 }
 
 .status-badge {
-    font-size: 0.7rem;
+    font-size: clamp(0.65rem, 1.3vw, 0.75rem);
     text-transform: uppercase;
     letter-spacing: 1px;
     background: rgba(34, 197, 94, 0.2);
     color: var(--success);
-    padding: 4px 10px;
+    padding: clamp(3px, 0.5vw, 4px) clamp(8px, 1.5vw, 10px);
     border-radius: 20px;
     font-weight: 600;
     animation: pulse 2s infinite;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 @keyframes pulse {
@@ -101,18 +112,20 @@ body {
 
 .header-actions {
     display: flex;
-    gap: 12px;
+    gap: clamp(8px, 1.5vw, 12px);
+    flex-wrap: wrap;
 }
 
 /* Button Styles */
 button {
     cursor: pointer;
     border: none;
-    border-radius: 8px;
+    border-radius: clamp(6px, 1.2vw, 8px);
     font-weight: 600;
-    padding: 10px 18px;
-    font-size: 0.9rem;
+    padding: clamp(8px, 1.5vw, 10px) clamp(12px, 2.5vw, 18px);
+    font-size: clamp(0.8rem, 1.6vw, 0.9rem);
     transition: all 0.2s ease;
+    white-space: nowrap;
 }
 
 button:disabled {
@@ -142,28 +155,33 @@ button:disabled {
     color: white;
 }
 
-.end-btn:hover {
+.end-btn:hover:not(:disabled) {
     background: #dc2626;
     transform: translateY(-1px);
+}
+
+.end-btn:active {
+    transform: translateY(0);
 }
 
 /* Error Alert */
 .error-alert {
     position: fixed;
-    top: 90px;
+    top: clamp(80px, 12vh, 90px);
     left: 50%;
     transform: translateX(-50%);
     background: rgba(239, 68, 68, 0.95);
     color: white;
-    padding: 1rem 1.5rem;
-    border-radius: 8px;
+    padding: clamp(0.75rem, 2vw, 1rem) clamp(1rem, 2.5vw, 1.5rem);
+    border-radius: clamp(6px, 1.2vw, 8px);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     z-index: 1000;
     display: flex;
     align-items: center;
-    gap: 1rem;
-    max-width: 500px;
+    gap: clamp(0.75rem, 2vw, 1rem);
+    max-width: min(90vw, 500px);
     animation: slideDown 0.3s ease;
+    font-size: clamp(0.85rem, 1.7vw, 0.95rem);
 }
 
 @keyframes slideDown {
@@ -182,11 +200,12 @@ button:disabled {
     background: transparent;
     border: none;
     color: white;
-    font-size: 1.5rem;
+    font-size: clamp(1.2rem, 2.5vw, 1.5rem);
     padding: 0;
-    width: 24px;
-    height: 24px;
+    width: clamp(20px, 4vw, 24px);
+    height: clamp(20px, 4vw, 24px);
     cursor: pointer;
+    flex-shrink: 0;
 }
 
 /* Main Content Area (Messages + Input) */
@@ -201,11 +220,12 @@ button:disabled {
 /* Message Log Area */
 .messages-log {
     flex: 1;
-    padding: 2rem;
+    padding: clamp(1rem, 3vw, 2rem);
     overflow-y: auto;
+    overflow-x: hidden;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: clamp(0.75rem, 1.5vw, 1rem);
     scroll-behavior: smooth;
 }
 
@@ -217,16 +237,19 @@ button:disabled {
     justify-content: center;
     height: 100%;
     color: var(--text-muted);
+    padding: 2rem;
+    text-align: center;
 }
 
 .messages-empty-icon {
-    font-size: 4rem;
-    margin-bottom: 1rem;
+    font-size: clamp(3rem, 8vw, 4rem);
+    margin-bottom: clamp(0.75rem, 2vw, 1rem);
     opacity: 0.5;
 }
 
 .messages-empty p {
-    font-size: 1.1rem;
+    font-size: clamp(0.95rem, 2vw, 1.1rem);
+    line-height: 1.6;
 }
 
 /* Message Bubbles */
@@ -251,10 +274,10 @@ button:disabled {
 .message-bubble {
     max-width: 70%;
     width: fit-content;
-    padding: 14px 18px;
+    padding: clamp(12px, 2vw, 14px) clamp(14px, 2.5vw, 18px);
     position: relative;
     background: var(--bg-card);
-    border-radius: 18px 18px 18px 4px;
+    border-radius: clamp(14px, 2.5vw, 18px) clamp(14px, 2.5vw, 18px) clamp(14px, 2.5vw, 18px) 4px;
     border: 1px solid var(--glass-border);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     transition: all 0.2s ease;
@@ -267,47 +290,50 @@ button:disabled {
 
 .sender-name {
     display: block;
-    font-size: 0.75rem;
+    font-size: clamp(0.7rem, 1.4vw, 0.75rem);
     color: var(--accent-secondary);
-    margin-bottom: 6px;
+    margin-bottom: clamp(4px, 1vw, 6px);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
 .message-text {
-    margin: 0 0 8px 0;
+    margin: 0 0 clamp(6px, 1.2vw, 8px) 0;
     line-height: 1.6;
-    font-size: 0.95rem;
+    font-size: clamp(0.9rem, 1.8vw, 0.95rem);
     word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .message-time {
     display: block;
-    font-size: 0.7rem;
+    font-size: clamp(0.65rem, 1.3vw, 0.7rem);
     color: var(--text-muted);
     text-align: right;
 }
 
 /* Message Input Form */
 .message-form {
-    padding: 1.5rem 2rem;
+    padding: clamp(1rem, 2.5vw, 1.5rem) clamp(1rem, 3vw, 2rem);
     display: flex;
-    gap: 12px;
+    gap: clamp(10px, 2vw, 12px);
     background: var(--bg-main);
     border-top: 1px solid var(--glass-border);
+    flex-shrink: 0;
 }
 
 .message-form input {
     flex: 1;
     background: var(--glass);
     border: 1px solid var(--glass-border);
-    border-radius: 12px;
-    padding: 0 20px;
+    border-radius: clamp(10px, 2vw, 12px);
+    padding: 0 clamp(16px, 3vw, 20px);
     color: white;
     outline: none;
-    font-size: 0.95rem;
-    height: 48px;
+    font-size: clamp(0.9rem, 1.8vw, 0.95rem);
+    height: clamp(44px, 8vw, 48px);
+    min-width: 0;
 }
 
 .message-form input::placeholder {
@@ -327,14 +353,19 @@ button:disabled {
 .message-form button {
     background: var(--grad-linear);
     color: white;
-    padding: 0 32px;
-    height: 48px;
+    padding: 0 clamp(24px, 5vw, 32px);
+    height: clamp(44px, 8vw, 48px);
     box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    flex-shrink: 0;
 }
 
 .message-form button:hover:not(:disabled) {
     box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
     transform: translateY(-2px);
+}
+
+.message-form button:active:not(:disabled) {
+    transform: translateY(0);
 }
 
 /* Notes Panel (Side Drawer) */
@@ -343,6 +374,7 @@ button:disabled {
     background: var(--bg-card);
     border-left: 1px solid var(--glass-border);
     overflow-y: auto;
+    overflow-x: hidden;
     width: 0;
     opacity: 0;
     visibility: hidden;
@@ -356,7 +388,7 @@ button:disabled {
 }
 
 .notes-panel-header {
-    padding: 1.5rem;
+    padding: clamp(1rem, 2.5vw, 1.5rem);
     position: sticky;
     top: 0;
     background: var(--bg-card);
@@ -365,25 +397,28 @@ button:disabled {
     align-items: center;
     border-bottom: 1px solid var(--glass-border);
     z-index: 10;
+    gap: 1rem;
 }
 
 .notes-panel-header h3 {
-    font-size: 1.1rem;
+    font-size: clamp(1rem, 2vw, 1.1rem);
     margin: 0;
     color: var(--text-primary);
+    font-weight: 700;
 }
 
 .notes-panel-actions {
     display: flex;
-    gap: 8px;
+    gap: clamp(6px, 1.2vw, 8px);
+    flex-shrink: 0;
 }
 
 .notes-refresh-btn,
 .notes-close-btn {
     background: transparent;
     color: var(--text-secondary);
-    padding: 6px 10px;
-    font-size: 1.2rem;
+    padding: clamp(4px, 1vw, 6px) clamp(8px, 1.5vw, 10px);
+    font-size: clamp(1rem, 2vw, 1.2rem);
     border-radius: 6px;
 }
 
@@ -394,7 +429,7 @@ button:disabled {
 }
 
 .notes-panel-content {
-    padding: 1rem;
+    padding: clamp(0.75rem, 2vw, 1rem);
 }
 
 /* Empty Notes State */
@@ -403,28 +438,28 @@ button:disabled {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 3rem 2rem;
+    padding: clamp(2rem, 5vw, 3rem) clamp(1.5rem, 3vw, 2rem);
     text-align: center;
     color: var(--text-muted);
 }
 
 .notes-empty-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
+    font-size: clamp(2.5rem, 6vw, 3rem);
+    margin-bottom: clamp(0.75rem, 2vw, 1rem);
     opacity: 0.5;
 }
 
 .notes-empty p {
-    font-size: 0.9rem;
+    font-size: clamp(0.85rem, 1.7vw, 0.9rem);
     line-height: 1.6;
 }
 
 /* Note Cards */
 .note-card {
-    margin-bottom: 1.5rem;
-    padding: 1.5rem;
+    margin-bottom: clamp(1rem, 2.5vw, 1.5rem);
+    padding: clamp(1rem, 2.5vw, 1.5rem);
     background: var(--glass);
-    border-radius: 12px;
+    border-radius: clamp(10px, 2vw, 12px);
     border: 1px solid var(--glass-border);
     animation: noteSlideIn 0.3s ease;
 }
@@ -442,14 +477,14 @@ button:disabled {
 }
 
 .note-timestamp {
-    font-size: 0.75rem;
+    font-size: clamp(0.7rem, 1.4vw, 0.75rem);
     color: var(--text-muted);
-    margin-bottom: 1rem;
+    margin-bottom: clamp(0.75rem, 2vw, 1rem);
     text-align: right;
 }
 
 .note-section {
-    margin-top: 1.5rem;
+    margin-top: clamp(1rem, 2.5vw, 1.5rem);
 }
 
 .note-section:first-child {
@@ -458,19 +493,19 @@ button:disabled {
 
 .note-section-title {
     color: var(--accent-secondary);
-    font-size: 0.85rem;
+    font-size: clamp(0.8rem, 1.6vw, 0.85rem);
     text-transform: uppercase;
-    margin-bottom: 12px;
+    margin-bottom: clamp(10px, 2vw, 12px);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: clamp(6px, 1.2vw, 8px);
     font-weight: 700;
     letter-spacing: 0.5px;
 }
 
 .note-section-content {
     color: var(--text-primary);
-    font-size: 0.9rem;
+    font-size: clamp(0.85rem, 1.7vw, 0.9rem);
     line-height: 1.6;
 }
 
@@ -485,7 +520,7 @@ button:disabled {
 }
 
 .note-section-content li {
-    padding: 8px 0;
+    padding: clamp(6px, 1.2vw, 8px) 0;
     border-bottom: 1px solid var(--glass-border);
 }
 
@@ -504,7 +539,7 @@ button:disabled {
     align-items: center;
     justify-content: center;
     height: 100vh;
-    font-size: 1.2rem;
+    font-size: clamp(1rem, 2.5vw, 1.2rem);
     color: var(--text-secondary);
 }
 
@@ -513,7 +548,7 @@ button:disabled {
     align-items: center;
     justify-content: center;
     height: 100vh;
-    font-size: 1.2rem;
+    font-size: clamp(1rem, 2.5vw, 1.2rem);
     color: var(--danger);
 }
 
@@ -536,8 +571,12 @@ button:disabled {
     background: var(--text-secondary);
 }
 
-/* Responsive Design */
-@media (max-width: 1024px) {
+/* ============================================
+   RESPONSIVE BREAKPOINTS
+   ============================================ */
+
+/* Large Tablets and Small Desktops (1024px - 1200px) */
+@media (max-width: 1200px) {
     .chat-container.notes-open {
         grid-template-columns: 1fr 350px;
     }
@@ -547,17 +586,42 @@ button:disabled {
     }
 }
 
+/* Tablets (768px - 1024px) */
+@media (max-width: 1024px) {
+    .chat-container.notes-open {
+        grid-template-columns: 1fr 320px;
+    }
+
+    .notes-panel.active {
+        width: 320px;
+    }
+
+    .message-bubble {
+        max-width: 80%;
+    }
+}
+
+/* Small Tablets and Large Phones (600px - 768px) */
 @media (max-width: 768px) {
     .chat-header {
         padding: 0 1rem;
+        flex-wrap: wrap;
+    }
+
+    .session-info {
+        flex-basis: 100%;
+        order: 1;
+    }
+
+    .header-actions {
+        flex-basis: 100%;
+        order: 2;
+        justify-content: flex-end;
+        margin-top: 0.5rem;
     }
 
     .session-info h2 {
         font-size: 1rem;
-    }
-
-    .header-actions {
-        gap: 8px;
     }
 
     button {
@@ -565,14 +629,17 @@ button:disabled {
         font-size: 0.85rem;
     }
 
+    /* Notes panel becomes full-screen overlay on mobile */
     .notes-panel.active {
         position: fixed;
         right: 0;
-        top: 70px;
+        top: clamp(60px, 10vh, 70px);
         bottom: 0;
         z-index: 999;
         width: 100%;
         max-width: 100vw;
+        border-left: none;
+        box-shadow: -4px 0 20px rgba(0, 0, 0, 0.5);
     }
 
     .chat-container.notes-open {
@@ -592,13 +659,91 @@ button:disabled {
     }
 }
 
+/* Mobile Devices (480px - 600px) */
+@media (max-width: 600px) {
+    .chat-container {
+        grid-template-rows: auto calc(100vh - auto);
+    }
+
+    .chat-header {
+        padding: 0.75rem;
+    }
+
+    .session-info {
+        gap: 0.5rem;
+    }
+
+    .session-info h2 {
+        font-size: 0.95rem;
+    }
+
+    .status-badge {
+        font-size: 0.65rem;
+        padding: 3px 8px;
+    }
+
+    .header-actions {
+        gap: 6px;
+    }
+
+    button {
+        padding: 7px 10px;
+        font-size: 0.8rem;
+    }
+
+    .message-bubble {
+        max-width: 90%;
+        padding: 10px 14px;
+    }
+
+    .messages-log {
+        padding: 0.75rem;
+    }
+
+    .message-form {
+        padding: 0.75rem;
+    }
+
+    .message-form input {
+        font-size: 0.9rem;
+    }
+
+    .note-card {
+        padding: 1rem;
+    }
+}
+
+/* Very Small Mobile (320px - 480px) */
 @media (max-width: 480px) {
-    .header-actions button span {
+
+    /* Simplify header for very small screens */
+    .header-actions {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .header-actions button {
+        flex-shrink: 0;
+    }
+
+    /* Hide button text on very small screens, show icons only */
+    .notes-btn span,
+    .end-btn span {
         display: none;
     }
 
-    .notes-btn::before {
+    /* Add icon-only content */
+    .notes-btn::after {
         content: "📝";
+    }
+
+    .notes-btn.active::after {
+        content: "✕";
+    }
+
+    .end-btn::after {
+        content: "🚪";
     }
 
     .session-info h2 {
@@ -606,7 +751,121 @@ button:disabled {
     }
 
     .status-badge {
-        font-size: 0.65rem;
-        padding: 3px 8px;
+        font-size: 0.6rem;
+        padding: 2px 6px;
+    }
+
+    button {
+        padding: 6px 10px;
+        font-size: 0.75rem;
+    }
+
+    .message-bubble {
+        max-width: 95%;
+    }
+
+    .messages-log {
+        padding: 0.5rem;
+        gap: 0.5rem;
+    }
+
+    .message-form {
+        padding: 0.5rem;
+        gap: 8px;
+    }
+
+    .message-form input {
+        padding: 0 12px;
+        font-size: 0.85rem;
+        height: 42px;
+    }
+
+    .message-form button {
+        padding: 0 16px;
+        height: 42px;
+        font-size: 0.85rem;
+    }
+
+    .error-alert {
+        max-width: 95vw;
+        font-size: 0.85rem;
+        padding: 0.75rem 1rem;
+    }
+}
+
+/* Extra Small Mobile (landscape mode) */
+@media (max-height: 500px) and (orientation: landscape) {
+    .chat-container {
+        grid-template-rows: 50px calc(100vh - 50px);
+    }
+
+    .chat-header {
+        min-height: 50px;
+        padding: 0.5rem 1rem;
+    }
+
+    .session-info h2 {
+        font-size: 0.9rem;
+    }
+
+    .status-badge {
+        font-size: 0.6rem;
+        padding: 2px 6px;
+    }
+
+    .header-actions button {
+        padding: 6px 10px;
+        font-size: 0.75rem;
+    }
+
+    .messages-log {
+        padding: 0.5rem;
+    }
+
+    .message-form {
+        padding: 0.5rem 1rem;
+    }
+
+    .message-form input,
+    .message-form button {
+        height: 36px;
+    }
+}
+
+/* Large Desktops (1400px+) */
+@media (min-width: 1400px) {
+    .chat-container.notes-open {
+        grid-template-columns: 1fr 450px;
+    }
+
+    .notes-panel.active {
+        width: 450px;
+    }
+
+    .messages-log {
+        padding: 2.5rem;
+    }
+
+    .message-form {
+        padding: 2rem 2.5rem;
+    }
+
+    .message-bubble {
+        max-width: 65%;
+    }
+}
+
+/* Extra Wide Screens (1920px+) */
+@media (min-width: 1920px) {
+    .chat-container.notes-open {
+        grid-template-columns: 1fr 500px;
+    }
+
+    .notes-panel.active {
+        width: 500px;
+    }
+
+    .message-bubble {
+        max-width: 60%;
     }
 }

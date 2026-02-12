@@ -10,6 +10,7 @@ const MicroChallenges = () => {
   const [activeType, setActiveType] = useState(null);
   const [feedback, setFeedback] = useState(null);
   const [previousQuestions, setPreviousQuestions] = useState([]);
+  const [showOptionsModal, setShowOptionsModal] = useState(false);
 
   const challengeTypes = useMemo(
     () => [
@@ -65,6 +66,7 @@ const MicroChallenges = () => {
     async (choice) => {
       if (loading) return;
 
+      setShowOptionsModal(false);
       setLoading(true);
       try {
         const res = await api.post("/exam-prep/solve/", {
@@ -75,7 +77,7 @@ const MicroChallenges = () => {
 
               VERDICT: CORRECT or INCORRECT
 
-              CORRECT ANSWER: [The correct option letter, e.g., A] with a short and sweet explanation (1-2 sentences).
+              CORRECT ANSWER: [The correct option letter] with a short and sweet explanation (1-2 sentences).
 
               EXPLANATION:
               - Line 1 explanation
@@ -87,6 +89,8 @@ const MicroChallenges = () => {
               - Use short sentences
               - Max 4 lines
               -Include bold texts where relevant
+              -Make Sure the correct optios are not repetative.
+              -The Text in options shouldnt be long, keep it short and sweet.
               
               Rules:
               - Decide the correct option first.
@@ -137,7 +141,6 @@ const MicroChallenges = () => {
         let text = optionMatch[1]
           .trim()
           .replace(/\*\*/g, "")
-          .replace(/\n/g, " ")
           .trim();
 
         options[letter] = {
@@ -160,10 +163,10 @@ const MicroChallenges = () => {
     [activeType, challengeTypes],
   );
 
-const isCorrectAnswer = useMemo(() => {
-  if (!feedback) return null;
-  return feedback.startsWith("VERDICT: CORRECT");
-}, [feedback]);
+  const isCorrectAnswer = useMemo(() => {
+    if (!feedback) return null;
+    return feedback.startsWith("VERDICT: CORRECT");
+  }, [feedback]);
 
   return (
     <div className="lab-container">
@@ -176,7 +179,7 @@ const isCorrectAnswer = useMemo(() => {
       <div className="main-interface">
         <header className="hero-section">
           <h1 className="logo">
-            NEURAL<span>LAB</span>
+            STUDY<span>-FUN</span>
           </h1>
           <p className="tagline">
             Elevate Your Mind Through Interactive Challenges
@@ -259,43 +262,15 @@ const isCorrectAnswer = useMemo(() => {
                   {activeType !== "fact" && (
                     <div className="options-section">
                       <h3 className="options-title">Select Your Answer</h3>
-                      <div className="options-grid">
-                        {Object.entries(parsedContent.options).map(
-                          ([letter, optionData], idx) => {
-                            const hasMoreText =
-                              optionData.short !== optionData.full;
-
-                            return (
-                              <button
-                                key={letter}
-                                className="option-card"
-                                onClick={() => verifyAnswer(letter)}
-                                style={{ animationDelay: `${idx * 0.1}s` }}
-                                aria-label={`Select option ${letter}`}
-                              >
-                                <div className="option-letter">{letter}</div>
-                                <div className="option-label">
-                                  <span className="option-text">
-                                    {optionData.short}
-                                  </span>
-                                  {hasMoreText && (
-                                    <span className="option-more-indicator">
-                                      hover for full text
-                                    </span>
-                                  )}
-                                </div>
-                                <div className="option-arrow">→</div>
-                                <div className="option-glow"></div>
-                                {hasMoreText && (
-                                  <div className="option-tooltip">
-                                    {optionData.full}
-                                  </div>
-                                )}
-                              </button>
-                            );
-                          },
-                        )}
-                      </div>
+                      <button
+                        className="view-options-button"
+                        onClick={() => setShowOptionsModal(true)}
+                        aria-label="View all options"
+                      >
+                        <span className="view-options-icon">📋</span>
+                        <span>View Options</span>
+                        <span className="view-options-arrow">→</span>
+                      </button>
                     </div>
                   )}
                 </div>
@@ -344,6 +319,63 @@ const isCorrectAnswer = useMemo(() => {
             </div>
           )}
         </section>
+
+        {/* Options Modal */}
+        {showOptionsModal && (
+          <div
+            className="modal-overlay"
+            onClick={() => setShowOptionsModal(false)}
+          >
+            <div
+              className="modal-content"
+              id="options-modal"
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                position: 'fixed',
+                width: '100vw',
+                maxWidth: '100vw',
+                margin: '0',
+                padding: '0 10px',
+                boxSizing: 'border-box',
+                left: '0',
+                right: '0',
+                top: '80px',
+                borderRadius: '16px',
+                overflow: 'visible'
+              }}
+            >
+              <div className="modal-header">
+                <h2 className="modal-title">Choose Your Answer</h2>
+                <button
+                  className="modal-close"
+                  onClick={() => setShowOptionsModal(false)}
+                  aria-label="Close modal"
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="modal-body">
+                {Object.entries(parsedContent.options).map(
+                  ([letter, optionData]) => (
+                    <button
+                      key={letter}
+                      className="modal-option-card"
+                      onClick={() => verifyAnswer(letter)}
+                    >
+                      <div className="modal-option-left">
+                        <div className="modal-option-letter">{letter}</div>
+                        <div className="modal-option-text">
+                          {optionData.full}
+                        </div>
+                      </div>
+
+                    </button>
+                  ),
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

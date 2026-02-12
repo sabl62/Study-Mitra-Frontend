@@ -4,11 +4,12 @@ import api from "../services/api";
 import "./Profile.css";
 
 const Profile = ({ username, isOwnProfile = true }) => {
-  const [activeTab, setActiveTab] = useState("about");
+
   const [notePrivacy, setNotePrivacy] = useState("public");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isSavingBio, setIsSavingBio] = useState(false);
   const [currentUploadingType, setCurrentUploadingType] = useState("");
+  const [selectedImage, setSelectedImage] = useState(null);
   const [bio, setBio] = useState({
     qualifications: "",
     interests: "",
@@ -201,7 +202,7 @@ const Profile = ({ username, isOwnProfile = true }) => {
         </div>
       )}
 
-      {/* Sidebar Navigation */}
+      {/* Sidebar Navigation
       <aside className="profile-sidebar">
         <div className="sidebar-header">
           <div className="profile-avatar-sidebar">
@@ -231,7 +232,7 @@ const Profile = ({ username, isOwnProfile = true }) => {
             </button>
           ))}
         </nav>
-      </aside>
+      </aside> */}
 
       {/* Main Content */}
       <main className="profile-main">
@@ -253,208 +254,231 @@ const Profile = ({ username, isOwnProfile = true }) => {
 
         {/* Tab Content */}
         <section className="tab-content-area">
-          {activeTab === "about" && (
-            <div className="about-section">
-              <div className="card-glass">
-                <h2 className="section-title">
-                  {isOwnProfile ? "Update Your Profile" : "About"}
-                </h2>
+          <div className="about-section">
+            <div className="card-glass">
+              <h2 className="section-title">
+                {isOwnProfile ? "Update Your Profile" : "About"}
+              </h2>
 
-                <div className="input-group">
-                  <label className="input-label">Qualifications</label>
-                  <textarea
-                    className="bio-textarea"
-                    placeholder={
-                      isOwnProfile
-                        ? "Degrees, Certifications, Achievements..."
-                        : "No qualifications added yet"
-                    }
-                    value={bio.qualifications}
-                    onChange={(e) =>
-                      setBio({ ...bio, qualifications: e.target.value })
-                    }
-                    readOnly={!isOwnProfile}
-                    rows={6}
-                  />
+              <div className="input-group">
+                <label className="input-label">Qualifications</label>
+                <textarea
+                  className="bio-textarea"
+                  placeholder={
+                    isOwnProfile
+                      ? "Degrees, Certifications, Achievements..."
+                      : "No qualifications added yet"
+                  }
+                  value={bio.qualifications}
+                  onChange={(e) =>
+                    setBio({ ...bio, qualifications: e.target.value })
+                  }
+                  readOnly={!isOwnProfile}
+                  rows={6}
+                />
+              </div>
+
+              {isOwnProfile && (
+                <button
+                  className="save-btn"
+                  onClick={handleUpdateBio}
+                  disabled={isSavingBio}
+                >
+                  {isSavingBio ? (
+                    <>
+                      <span className="btn-spinner"></span>
+                      Saving...
+                    </>
+                  ) : (
+                    "Update Bio"
+                  )}
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className="notes-section">
+            {isOwnProfile && (
+              <div className="card-glass upload-card">
+                <div className="upload-header">
+                  <h3 className="section-title">Share Your Knowledge</h3>
+                  <div className="privacy-toggle-container">
+                    <span className="toggle-label">Privacy:</span>
+                    <div
+                      className={`privacy-toggle ${notePrivacy}`}
+                      onClick={() =>
+                        setNotePrivacy((prev) =>
+                          prev === "public" ? "private" : "public",
+                        )
+                      }
+                    >
+                      <div className="toggle-slider"></div>
+                      <span className="toggle-text public">Public</span>
+                      <span className="toggle-text private">Private</span>
+                    </div>
+                  </div>
                 </div>
 
-                {isOwnProfile && (
-                  <button
-                    className="save-btn"
-                    onClick={handleUpdateBio}
-                    disabled={isSavingBio}
-                  >
-                    {isSavingBio ? (
+                <button
+                  className="upload-trigger-btn"
+                  onClick={() => openUploadWidget("note")}
+                >
+                  <span className="btn-icon">📤</span>
+                  Upload Notes
+                </button>
+              </div>
+            )}
+
+            <div className="notes-grid">
+              {userNotes.length === 0 ? (
+                <div className="empty-state">
+                  <div className="empty-icon">📝</div>
+                  <h3>No notes yet</h3>
+                  <p>
+                    {isOwnProfile
+                      ? "Upload your first note to get started"
+                      : "This user hasn't shared any notes yet"}
+                  </p>
+                </div>
+              ) : (
+                userNotes.map((note) => (
+                  <div key={note.id} className="note-card card-glass">
+                    <div className="note-header">
+                      <h4 className="note-title">{note.title}</h4>
+                      <span
+                        className={`visibility-badge ${note.is_public ? "public" : "private"}`}
+                      >
+                        {note.is_public ? "🌐 Public" : "🔒 Private"}
+                      </span>
+                    </div>
+                    <div
+                      className="note-preview"
+                      onClick={() => setSelectedImage(note.file_url)}
+                    >
+                      <img src={note.file_url} alt={note.title} />
+                    </div>
+
+                    <div className="note-footer">
+                      <span className="note-date">
+                        {new Date(note.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          <div className="portfolio-section">
+            <div className="portfolio-header-box card-glass">
+              <div className="ai-status">
+                <span className="sparkle">✨</span>
+                <div className="ai-status-text">
+                  <h3 className="ai-title">Portfolio Builder</h3>
+                  <div className="skills-summary-container">
+                    {allSkills.length > 0 ? (
                       <>
-                        <span className="btn-spinner"></span>
-                        Saving...
+                        <span className="skills-count-badge">
+                          {allSkills.length} Skills Identified
+                        </span>
+                        <div className="skills-flex-wrapper">
+                          {allSkills.map((skill, index) => (
+                            <span key={index} className="skill-tag">
+                              {skill}
+                            </span>
+                          ))}
+                        </div>
                       </>
                     ) : (
-                      "Update Bio"
+                      <p className="empty-skills-text">
+                        Upload certificates to build your skill portfolio
+                      </p>
                     )}
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
-
-          {activeTab === "notes" && (
-            <div className="notes-section">
-              {isOwnProfile && (
-                <div className="card-glass upload-card">
-                  <div className="upload-header">
-                    <h3 className="section-title">Share Your Knowledge</h3>
-                    <div className="privacy-toggle-container">
-                      <span className="toggle-label">Privacy:</span>
-                      <div
-                        className={`privacy-toggle ${notePrivacy}`}
-                        onClick={() =>
-                          setNotePrivacy((prev) =>
-                            prev === "public" ? "private" : "public",
-                          )
-                        }
-                      >
-                        <div className="toggle-slider"></div>
-                        <span className="toggle-text public">Public</span>
-                        <span className="toggle-text private">Private</span>
-                      </div>
-                    </div>
                   </div>
-
-                  <button
-                    className="upload-trigger-btn"
-                    onClick={() => openUploadWidget("note")}
-                  >
-                    <span className="btn-icon">📤</span>
-                    Upload Notes
-                  </button>
                 </div>
-              )}
-
-              <div className="notes-grid">
-                {userNotes.length === 0 ? (
-                  <div className="empty-state">
-                    <div className="empty-icon">📝</div>
-                    <h3>No notes yet</h3>
-                    <p>
-                      {isOwnProfile
-                        ? "Upload your first note to get started"
-                        : "This user hasn't shared any notes yet"}
-                    </p>
-                  </div>
-                ) : (
-                  userNotes.map((note) => (
-                    <div key={note.id} className="note-card card-glass">
-                      <div className="note-header">
-                        <h4 className="note-title">{note.title}</h4>
-                        <span
-                          className={`visibility-badge ${note.is_public ? "public" : "private"}`}
-                        >
-                          {note.is_public ? "🌐 Public" : "🔒 Private"}
-                        </span>
-                      </div>
-                      <div className="note-preview">
-                        <img src={note.file_url} alt={note.title} />
-                      </div>
-                      <div className="note-footer">
-                        <span className="note-date">
-                          {new Date(note.created_at).toLocaleDateString()}
-                        </span>
-                      </div>
-                    </div>
-                  ))
-                )}
               </div>
-            </div>
-          )}
 
-          {activeTab === "portfolio" && (
-            <div className="portfolio-section">
-              <div className="portfolio-header-box card-glass">
-                <div className="ai-status">
-                  <span className="sparkle">✨</span>
-                  <div className="ai-status-text">
-                    <h3 className="ai-title">AI Portfolio Builder</h3>
-                    <div className="skills-summary-container">
-                      {allSkills.length > 0 ? (
-                        <>
-                          <span className="skills-count-badge">
-                            {allSkills.length} Skills Identified
-                          </span>
-                          <div className="skills-flex-wrapper">
-                            {allSkills.map((skill, index) => (
-                              <span key={index} className="skill-tag">
-                                {skill}
-                              </span>
-                            ))}
-                          </div>
-                        </>
-                      ) : (
-                        <p className="empty-skills-text">
-                          Upload certificates to build your skill portfolio
-                        </p>
+              {isOwnProfile && (
+                <button
+                  className="upload-trigger-btn primary"
+                  onClick={() => openUploadWidget("certificate")}
+                >
+                  <span className="btn-icon">🏆</span>
+                  Add Certificate
+                </button>
+              )}
+            </div>
+
+            <div className="certificates-grid">
+              {certificates.length === 0 ? (
+                <div className="empty-state">
+                  <div className="empty-icon">🏆</div>
+                  <h3>No certificates yet</h3>
+                  <p>
+                    {isOwnProfile
+                      ? "Upload your achievements to showcase your skills"
+                      : "This user hasn't added any certificates yet"}
+                  </p>
+                </div>
+              ) : (
+                certificates.map((cert) => (
+                  <div
+                    key={cert.id}
+                    className={`cert-card card-glass ${cert.title === "Processing..." ? "is-processing" : ""}`}
+                  >
+                    <div className="cert-img-container">
+                      <img
+                        src={cert.file_url}
+                        alt={cert.title}
+                        onClick={() => setSelectedImage(cert.file_url)}
+                      />
+
+                      {cert.title === "Processing..." && (
+                        <div className="processing-overlay">
+                          <div className="processing-spinner"></div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="cert-info">
+                      <h4 className="cert-title">{cert.title}</h4>
+                      {cert.skills && cert.skills.length > 0 && (
+                        <div className="skills-list">
+                          {cert.skills.map((skill, idx) => (
+                            <span key={idx} className="skill-badge">
+                              {skill}
+                            </span>
+                          ))}
+                        </div>
                       )}
                     </div>
                   </div>
-                </div>
-
-                {isOwnProfile && (
-                  <button
-                    className="upload-trigger-btn primary"
-                    onClick={() => openUploadWidget("certificate")}
-                  >
-                    <span className="btn-icon">🏆</span>
-                    Add Certificate
-                  </button>
-                )}
-              </div>
-
-              <div className="certificates-grid">
-                {certificates.length === 0 ? (
-                  <div className="empty-state">
-                    <div className="empty-icon">🏆</div>
-                    <h3>No certificates yet</h3>
-                    <p>
-                      {isOwnProfile
-                        ? "Upload your achievements to showcase your skills"
-                        : "This user hasn't added any certificates yet"}
-                    </p>
-                  </div>
-                ) : (
-                  certificates.map((cert) => (
-                    <div
-                      key={cert.id}
-                      className={`cert-card card-glass ${cert.title === "Processing..." ? "is-processing" : ""}`}
-                    >
-                      <div className="cert-img-container">
-                        <img src={cert.file_url} alt={cert.title} />
-                        {cert.title === "Processing..." && (
-                          <div className="processing-overlay">
-                            <div className="processing-spinner"></div>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="cert-info">
-                        <h4 className="cert-title">{cert.title}</h4>
-                        {cert.skills && cert.skills.length > 0 && (
-                          <div className="skills-list">
-                            {cert.skills.map((skill, idx) => (
-                              <span key={idx} className="skill-badge">
-                                {skill}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
+                ))
+              )}
             </div>
-          )}
+          </div>
         </section>
       </main>
+      {selectedImage && (
+        <div
+          className="image-modal-overlay"
+          onClick={() => setSelectedImage(null)}
+        >
+          <div
+            className="image-modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="modal-close-btn"
+              onClick={() => setSelectedImage(null)}
+            >
+              ✕
+            </button>
+
+            <img src={selectedImage} alt="Preview" />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

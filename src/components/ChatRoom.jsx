@@ -106,6 +106,36 @@ const ChatRoom = () => {
     return () => unsubscribe();
   }, [session?.firestore_chat_id, scrollToBottom]);
 
+  useEffect(() => {
+
+    const notifyLeave = () => {
+
+      const url = `${import.meta.env.VITE_API_URL}/sessions/${sessionId}/leave/` || `http://localhost:8000/api/sessions/${sessionId}/leave/`;
+      navigator.sendBeacon(url);
+
+
+      api.post(`/sessions/${sessionId}/leave/`).catch(() => {});
+    };
+
+
+    return () => {
+      notifyLeave();
+    };
+  }, [sessionId]);
+
+  useEffect(() => {
+    const handleBackButton = () => {
+      api.post(`/sessions/${sessionId}/leave/`);
+    };
+
+    window.addEventListener("popstate", handleBackButton);
+    return () => {
+      window.removeEventListener("popstate", handleBackButton);
+      // Trigger leave on unmount too
+      api.post(`/sessions/${sessionId}/leave/`).catch(() => {});
+    };
+  }, [sessionId]);
+
   const fetchNotes = async () => {
     try {
       const response = await api.get(`/sessions/${sessionId}/notes/`);
@@ -411,6 +441,6 @@ const ChatRoom = () => {
       </aside>
     </div>
   );
-};
+};;
 
 export default ChatRoom;

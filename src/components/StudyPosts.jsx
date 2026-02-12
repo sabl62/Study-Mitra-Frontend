@@ -166,7 +166,6 @@ function StudyPosts() {
       <div className="loading-container">
         <div className="spinner"></div>
 
-        <p>Finding active study sessions...</p>
       </div>
     );
   }

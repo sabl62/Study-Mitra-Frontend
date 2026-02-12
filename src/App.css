@@ -11,81 +11,44 @@ body {
   color: #ffffff;
   overflow: hidden;
   /* Prevents double scrollbars on the window */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .App {
   height: 100vh;
   display: flex;
   flex-direction: column;
+  position: relative;
+}
+
+/* --- Loading Screen --- */
+.loading-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #05070a;
+  color: #94a3b8;
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  font-weight: 600;
 }
 
 /* --- Navbar --- */
 .app-navbar {
-  height: 70px;
-  padding: 0 2rem;
+  height: clamp(60px, 10vh, 80px);
+  padding: 0 clamp(1rem, 3vw, 2rem);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(5, 7, 10, 0.8);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  z-index: 1000;
-}
-
-.logo {
-  font-size: 1.4rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  color: #ffffff;
-}
-
-.logout-button {
-  padding: 0.6rem 1.2rem;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.05);
-  color: #94a3b8;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.logout-button:hover {
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
-}
-
-/* --- Layout Structure --- */
-.main-layout {
-  display: flex;
-  flex: 1;
-  /* Takes up remaining height below navbar */
-  overflow: hidden;
-  /* Contains the children */
-}
-
-.content-area {
-  flex: 1;
-  overflow-y: auto;
-  /* THIS FIXES YOUR SCROLLING */
-  height: 100%;
-  background: #05070a;
-}
-
-/* --- Navbar Layout Fix --- */
-.app-navbar {
-  height: 70px;
-  padding: 0 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  /* Distributes the three sections */
   background: rgba(5, 7, 10, 0.8);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   position: sticky;
   top: 0;
   z-index: 1000;
+  gap: clamp(0.75rem, 2vw, 1.5rem);
+  flex-shrink: 0;
 }
 
 /* Ensure Left and Right take equal space to keep Center in the middle */
@@ -94,6 +57,7 @@ body {
   flex: 1;
   display: flex;
   align-items: center;
+  min-width: 0;
 }
 
 .nav-right {
@@ -106,14 +70,39 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  min-width: 0;
+}
+
+/* --- Logo Styling --- */
+.logo-link {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.logo-link:hover {
+  transform: scale(1.02);
+}
+
+.logo {
+  font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  white-space: nowrap;
 }
 
 /* --- Username Styling --- */
 .welcome-text {
   font-family: 'Plus Jakarta Sans', sans-serif;
   color: var(--text-dim, #94a3b8);
-  font-size: 0.95rem;
+  font-size: clamp(0.85rem, 1.8vw, 0.95rem);
   font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .user-highlight {
@@ -123,4 +112,438 @@ body {
   background: linear-gradient(135deg, #6366f1, #a855f7);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* --- Logout Button --- */
+.logout-button {
+  padding: clamp(0.5rem, 1.2vw, 0.6rem) clamp(1rem, 2vw, 1.2rem);
+  border-radius: clamp(8px, 1.5vw, 10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
+  font-weight: 600;
+  font-size: clamp(0.85rem, 1.7vw, 0.9rem);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.logout-button:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.2);
+  transform: translateY(-1px);
+}
+
+.logout-button:active {
+  transform: translateY(0);
+}
+
+/* --- Layout Structure --- */
+.main-layout {
+  display: flex;
+  flex: 1;
+  /* Takes up remaining height below navbar */
+  overflow: hidden;
+  /* Contains the children */
+  position: relative;
+}
+
+.main-layout.auth-mode {
+  /* Special styling when showing login/signup */
+  background: radial-gradient(circle at 100% 100%, #1a1033 0%, #0b0f1a 100%);
+}
+
+.content-area {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 100%;
+  background: #05070a;
+  position: relative;
+  -webkit-overflow-scrolling: touch;
+  /* Smooth scrolling on iOS */
+}
+
+/* ============================================
+   RESPONSIVE BREAKPOINTS
+   ============================================ */
+
+/* Large Tablets (900px - 1024px) */
+@media (max-width: 1024px) {
+  .app-navbar {
+    padding: 0 1.5rem;
+  }
+
+  .nav-center {
+    flex: 1.5;
+  }
+}
+
+/* Tablets (768px - 900px) */
+@media (max-width: 900px) {
+  .app-navbar {
+    padding: 0 1rem;
+  }
+
+  .welcome-text {
+    font-size: 0.85rem;
+  }
+
+  .logout-button {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+}
+
+/* Mobile Devices (600px - 768px) */
+@media (max-width: 768px) {
+  .app-navbar {
+    height: clamp(60px, 10vh, 70px);
+    padding: 0 1rem;
+    gap: 0.5rem;
+  }
+
+  .nav-left,
+  .nav-right,
+  .nav-center {
+    flex: auto;
+  }
+
+  .nav-center {
+    display: none;
+    /* Hide welcome message on mobile to save space */
+  }
+
+  .nav-left {
+    flex: 1;
+  }
+
+  .nav-right {
+    flex: 0;
+  }
+
+  .logo {
+    font-size: 1.1rem;
+  }
+
+  .logout-button {
+    padding: 0.5rem 0.875rem;
+    font-size: 0.8rem;
+  }
+
+  /* Account for bottom navigation bar */
+  .main-layout {
+    flex-direction: column-reverse;
+  }
+
+  .content-area {
+    flex: 1;
+    margin-bottom: 0;
+  }
+}
+
+/* Small Mobile (480px - 600px) */
+@media (max-width: 600px) {
+  .app-navbar {
+    padding: 0 0.75rem;
+  }
+
+  .logo {
+    font-size: 1rem;
+  }
+
+  .logout-button {
+    padding: 0.45rem 0.75rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* Very Small Mobile (320px - 480px) */
+@media (max-width: 480px) {
+  .app-navbar {
+    height: 60px;
+    padding: 0 0.5rem;
+  }
+
+  .logo {
+    font-size: 0.95rem;
+  }
+
+  .logout-button {
+    padding: 0.4rem 0.65rem;
+    font-size: 0.7rem;
+  }
+
+  .logout-button::before {
+    content: "🚪 ";
+  }
+}
+
+/* Extra Small Mobile - Icon only logout */
+@media (max-width: 375px) {
+  .logout-button {
+    padding: 0.5rem;
+    min-width: 40px;
+    font-size: 1.2rem;
+  }
+
+  .logout-button::before {
+    content: "🚪";
+  }
+
+  /* Hide text, show icon only */
+  .logout-button {
+    font-size: 0;
+  }
+
+  .logout-button::before {
+    font-size: 1.2rem;
+  }
+}
+
+/* Landscape Mode on Mobile */
+@media (max-height: 500px) and (orientation: landscape) and (max-width: 900px) {
+  .app-navbar {
+    height: 50px;
+    padding: 0 1rem;
+  }
+
+  .logo {
+    font-size: 0.95rem;
+  }
+
+  .nav-center {
+    display: none;
+  }
+
+  .logout-button {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.75rem;
+  }
+
+  .main-layout {
+    flex-direction: row;
+    height: calc(100vh - 50px);
+  }
+}
+
+/* Large Desktops (1400px+) */
+@media (min-width: 1400px) {
+  .app-navbar {
+    height: 80px;
+    padding: 0 2.5rem;
+  }
+
+  .logo {
+    font-size: 1.5rem;
+  }
+
+  .welcome-text {
+    font-size: 1rem;
+  }
+
+  .logout-button {
+    padding: 0.7rem 1.4rem;
+    font-size: 0.95rem;
+  }
+}
+
+/* Extra Wide Screens (1920px+) */
+@media (min-width: 1920px) {
+  .app-navbar {
+    padding: 0 3rem;
+  }
+
+  .logo {
+    font-size: 1.6rem;
+  }
+
+  .welcome-text {
+    font-size: 1.05rem;
+  }
+}
+
+/* Hover Effects Enhancement for Desktop */
+@media (hover: hover) and (pointer: fine) {
+  .logo-link:hover .logo {
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .logout-button {
+    min-height: 44px;
+    /* Ensure touch target size */
+  }
+
+  .logout-button:hover {
+    transform: none;
+  }
+
+  .logout-button:active {
+    background: rgba(239, 68, 68, 0.15);
+  }
+
+  .logo-link:active {
+    opacity: 0.8;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .app-navbar {
+    display: none;
+  }
+
+  .main-layout {
+    display: block;
+  }
+
+  .content-area {
+    overflow: visible;
+    height: auto;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .logout-button:hover,
+  .logo-link:hover {
+    transform: none;
+  }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  .app-navbar {
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .logout-button {
+    border: 2px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .logout-button:hover {
+    border-color: #ef4444;
+  }
+
+  .logout-button:focus {
+    outline: 2px solid #6366f1;
+    outline-offset: 2px;
+  }
+}
+
+/* Dark Mode Support (respects system preference) */
+@media (prefers-color-scheme: dark) {
+
+  /* Already dark by default, but ensures consistency */
+  body {
+    background-color: #05070a;
+    color: #ffffff;
+  }
+}
+
+/* Light Mode Support (if ever needed) */
+@media (prefers-color-scheme: light) {
+
+  /* Keep dark theme regardless - Study Mitra is a dark-first app */
+  body {
+    background-color: #05070a;
+    color: #ffffff;
+  }
+}
+
+/* Focus Visible for Keyboard Navigation */
+.logout-button:focus-visible,
+.logo-link:focus-visible {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+  border-radius: 10px;
+}
+
+/* Safe Area Insets for Mobile Devices (notches, etc.) */
+@supports (padding: max(0px)) {
+  .app-navbar {
+    padding-left: max(clamp(1rem, 3vw, 2rem), env(safe-area-inset-left));
+    padding-right: max(clamp(1rem, 3vw, 2rem), env(safe-area-inset-right));
+  }
+
+  @media (max-width: 768px) {
+    .content-area {
+      padding-bottom: max(0px, env(safe-area-inset-bottom));
+    }
+  }
+}
+
+/* Scrollbar Styling for Webkit browsers */
+.content-area::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.content-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.content-area::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+.content-area::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Firefox Scrollbar Styling */
+.content-area {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+/* Skeleton Loading Animation (for loading screen) */
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.loading-screen {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Smooth Transitions */
+.nav-left,
+.nav-center,
+.nav-right {
+  transition: flex 0.3s ease;
+}
+
+/* Ensure proper stacking context */
+.App {
+  isolation: isolate;
+}
+
+.app-navbar {
+  isolation: isolate;
 }
