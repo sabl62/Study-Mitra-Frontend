@@ -34,9 +34,10 @@ body {
     display: grid;
     grid-template-areas:
         "header header"
-        "content notes";
+        "content notes"
+        "actions actions";
     grid-template-columns: 1fr 0;
-    grid-template-rows: clamp(60px, 10vh, 70px) calc(100vh - clamp(60px, 10vh, 70px));
+    grid-template-rows: clamp(50px, 8vh, 60px) 1fr clamp(60px, 10vh, 70px);
     height: 100vh;
     overflow: hidden;
     transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -47,55 +48,55 @@ body {
     grid-template-columns: 1fr 400px;
 }
 
-/* Header Styling */
+/* ============================================
+   MINIMALIST HEADER
+   ============================================ */
 .chat-header {
     grid-area: header;
-    background: var(--glass);
-    backdrop-filter: blur(12px);
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--glass-border);
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     padding: 0 clamp(1rem, 3vw, 2rem);
     z-index: 100;
-    gap: clamp(0.5rem, 2vw, 1rem);
-    flex-wrap: wrap;
-    min-height: clamp(60px, 10vh, 70px);
 }
 
 .session-info {
     display: flex;
     align-items: center;
     gap: clamp(0.75rem, 2vw, 1rem);
-    flex: 1;
-    min-width: 0;
+    max-width: 100%;
 }
 
 .session-info h2 {
-    font-size: clamp(1rem, 2.5vw, 1.2rem);
+    font-size: clamp(0.95rem, 2vw, 1.1rem);
     margin: 0;
     background: var(--grad-linear);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    font-weight: 700;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-weight: 700;
 }
 
 .status-badge {
-    font-size: clamp(0.65rem, 1.3vw, 0.75rem);
+    font-size: clamp(0.65rem, 1.3vw, 0.7rem);
     text-transform: uppercase;
-    letter-spacing: 1px;
-    background: rgba(34, 197, 94, 0.2);
+    letter-spacing: 0.5px;
+    background: rgba(34, 197, 94, 0.15);
     color: var(--success);
-    padding: clamp(3px, 0.5vw, 4px) clamp(8px, 1.5vw, 10px);
-    border-radius: 20px;
+    padding: clamp(4px, 0.8vw, 5px) clamp(10px, 2vw, 12px);
+    border-radius: 12px;
     font-weight: 600;
     animation: pulse 2s infinite;
     white-space: nowrap;
     flex-shrink: 0;
+    border: 1px solid rgba(34, 197, 94, 0.3);
 }
 
 @keyframes pulse {
@@ -110,70 +111,123 @@ body {
     }
 }
 
+/* Hide old header actions */
 .header-actions {
+    display: none;
+}
+
+/* ============================================
+   FLOATING ACTION BAR (BOTTOM)
+   ============================================ */
+.floating-actions {
+    grid-area: actions;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--glass-border);
     display: flex;
-    gap: clamp(8px, 1.5vw, 12px);
-    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-around;
+    padding: clamp(0.75rem, 2vw, 1rem) clamp(1rem, 3vw, 2rem);
+    gap: clamp(0.75rem, 2vw, 1rem);
+    z-index: 200;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
 }
 
-/* Button Styles */
-button {
-    cursor: pointer;
+.action-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(0.5rem, 1.5vw, 0.75rem);
+    padding: clamp(0.75rem, 2vw, 1rem);
     border: none;
-    border-radius: clamp(6px, 1.2vw, 8px);
+    border-radius: clamp(10px, 2vw, 12px);
     font-weight: 600;
-    padding: clamp(8px, 1.5vw, 10px) clamp(12px, 2.5vw, 18px);
-    font-size: clamp(0.8rem, 1.6vw, 0.9rem);
-    transition: all 0.2s ease;
+    font-size: clamp(0.85rem, 1.7vw, 0.95rem);
+    cursor: pointer;
+    transition: all 0.3s ease;
     white-space: nowrap;
+    max-width: 300px;
 }
 
-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+.action-btn-icon {
+    font-size: clamp(1.1rem, 2.2vw, 1.3rem);
+    flex-shrink: 0;
 }
 
-.notes-btn {
-    background: var(--glass);
-    color: var(--text-primary);
-    border: 1px solid var(--glass-border);
+.action-btn-text {
+    font-weight: 600;
 }
 
-.notes-btn:hover:not(:disabled) {
-    background: var(--glass-border);
-    transform: translateY(-1px);
+/* Notes Toggle Button */
+.action-btn.notes-toggle {
+    background: rgba(99, 102, 241, 0.1);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    color: var(--accent-primary);
 }
 
-.notes-btn.active {
+.action-btn.notes-toggle.active {
     background: var(--accent-primary);
     color: white;
     border-color: var(--accent-primary);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 
-.end-btn {
-    background: var(--danger);
+.action-btn.notes-toggle:hover:not(:disabled) {
+    background: rgba(99, 102, 241, 0.2);
+    border-color: var(--accent-primary);
+    transform: translateY(-2px);
+}
+
+.action-btn.notes-toggle.active:hover {
+    background: #5558e3;
+}
+
+/* Generate Notes Button */
+.action-btn.generate {
+    background: var(--grad-linear);
     color: white;
+    border: none;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
 }
 
-.end-btn:hover:not(:disabled) {
-    background: #dc2626;
-    transform: translateY(-1px);
+.action-btn.generate:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
 }
 
-.end-btn:active {
-    transform: translateY(0);
+.action-btn.generate:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Leave/End Session Button */
+.action-btn.leave {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+}
+
+.action-btn.leave:hover:not(:disabled) {
+    background: #ef4444;
+    color: white;
+    border-color: #ef4444;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
 /* Error Alert */
 .error-alert {
     position: fixed;
-    top: clamp(80px, 12vh, 90px);
+    top: clamp(70px, 12vh, 80px);
     left: 50%;
     transform: translateX(-50%);
     background: rgba(239, 68, 68, 0.95);
     color: white;
     padding: clamp(0.75rem, 2vw, 1rem) clamp(1rem, 2.5vw, 1.5rem);
-    border-radius: clamp(6px, 1.2vw, 8px);
+    border-radius: clamp(8px, 1.5vw, 10px);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     z-index: 1000;
     display: flex;
@@ -182,6 +236,7 @@ button:disabled {
     max-width: min(90vw, 500px);
     animation: slideDown 0.3s ease;
     font-size: clamp(0.85rem, 1.7vw, 0.95rem);
+    border: 1px solid rgba(239, 68, 68, 0.5);
 }
 
 @keyframes slideDown {
@@ -206,9 +261,12 @@ button:disabled {
     height: clamp(20px, 4vw, 24px);
     cursor: pointer;
     flex-shrink: 0;
+    line-height: 1;
 }
 
-/* Main Content Area (Messages + Input) */
+/* ============================================
+   MAIN CONTENT AREA (MESSAGES + INPUT)
+   ============================================ */
 .chat-main-content {
     grid-area: content;
     display: flex;
@@ -227,6 +285,7 @@ button:disabled {
     flex-direction: column;
     gap: clamp(0.75rem, 1.5vw, 1rem);
     scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* Empty State */
@@ -237,7 +296,7 @@ button:disabled {
     justify-content: center;
     height: 100%;
     color: var(--text-muted);
-    padding: 2rem;
+    padding: clamp(1.5rem, 3vw, 2rem);
     text-align: center;
 }
 
@@ -357,6 +416,12 @@ button:disabled {
     height: clamp(44px, 8vw, 48px);
     box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
     flex-shrink: 0;
+    border: none;
+    border-radius: clamp(10px, 2vw, 12px);
+    font-weight: 600;
+    font-size: clamp(0.9rem, 1.8vw, 0.95rem);
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .message-form button:hover:not(:disabled) {
@@ -368,7 +433,14 @@ button:disabled {
     transform: translateY(0);
 }
 
-/* Notes Panel (Side Drawer) */
+.message-form button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ============================================
+   NOTES PANEL (SIDE DRAWER)
+   ============================================ */
 .notes-panel {
     grid-area: notes;
     background: var(--bg-card);
@@ -417,9 +489,17 @@ button:disabled {
 .notes-close-btn {
     background: transparent;
     color: var(--text-secondary);
-    padding: clamp(4px, 1vw, 6px) clamp(8px, 1.5vw, 10px);
+    padding: clamp(6px, 1.2vw, 8px);
     font-size: clamp(1rem, 2vw, 1.2rem);
     border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: clamp(32px, 5vw, 36px);
+    min-height: clamp(32px, 5vw, 36px);
 }
 
 .notes-refresh-btn:hover:not(:disabled),
@@ -599,42 +679,38 @@ button:disabled {
     .message-bubble {
         max-width: 80%;
     }
+
+    .floating-actions {
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+    }
+
+    .action-btn {
+        padding: 0.75rem;
+    }
 }
 
 /* Small Tablets and Large Phones (600px - 768px) */
 @media (max-width: 768px) {
-    .chat-header {
-        padding: 0 1rem;
-        flex-wrap: wrap;
-    }
-
-    .session-info {
-        flex-basis: 100%;
-        order: 1;
-    }
-
-    .header-actions {
-        flex-basis: 100%;
-        order: 2;
-        justify-content: flex-end;
-        margin-top: 0.5rem;
+    .chat-container {
+        grid-template-rows: 50px 1fr 70px;
     }
 
     .session-info h2 {
-        font-size: 1rem;
+        font-size: 0.9rem;
     }
 
-    button {
-        padding: 8px 12px;
-        font-size: 0.85rem;
+    .status-badge {
+        font-size: 0.6rem;
+        padding: 3px 8px;
     }
 
     /* Notes panel becomes full-screen overlay on mobile */
     .notes-panel.active {
         position: fixed;
         right: 0;
-        top: clamp(60px, 10vh, 70px);
-        bottom: 0;
+        top: 50px;
+        bottom: 70px;
         z-index: 999;
         width: 100%;
         max-width: 100vw;
@@ -657,16 +733,26 @@ button:disabled {
     .message-form {
         padding: 1rem;
     }
+
+    .floating-actions {
+        padding: 0.75rem;
+        gap: 0.5rem;
+    }
+
+    .action-btn-text {
+        display: none;
+    }
+
+    .action-btn {
+        padding: 0.75rem;
+        min-width: clamp(50px, 15vw, 60px);
+    }
 }
 
 /* Mobile Devices (480px - 600px) */
 @media (max-width: 600px) {
-    .chat-container {
-        grid-template-rows: auto calc(100vh - auto);
-    }
-
     .chat-header {
-        padding: 0.75rem;
+        padding: 0 1rem;
     }
 
     .session-info {
@@ -674,21 +760,7 @@ button:disabled {
     }
 
     .session-info h2 {
-        font-size: 0.95rem;
-    }
-
-    .status-badge {
-        font-size: 0.65rem;
-        padding: 3px 8px;
-    }
-
-    .header-actions {
-        gap: 6px;
-    }
-
-    button {
-        padding: 7px 10px;
-        font-size: 0.8rem;
+        font-size: 0.85rem;
     }
 
     .message-bubble {
@@ -706,62 +778,43 @@ button:disabled {
 
     .message-form input {
         font-size: 0.9rem;
+        height: 42px;
+    }
+
+    .message-form button {
+        height: 42px;
+        padding: 0 20px;
     }
 
     .note-card {
         padding: 1rem;
     }
+
+    .floating-actions {
+        padding: 0.5rem;
+        gap: 0.5rem;
+    }
+
+    .action-btn {
+        font-size: 1.1rem;
+        min-width: 50px;
+    }
 }
 
 /* Very Small Mobile (320px - 480px) */
 @media (max-width: 480px) {
-
-    /* Simplify header for very small screens */
-    .header-actions {
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .header-actions button {
-        flex-shrink: 0;
-    }
-
-    /* Hide button text on very small screens, show icons only */
-    .notes-btn span,
-    .end-btn span {
-        display: none;
-    }
-
-    /* Add icon-only content */
-    .notes-btn::after {
-        content: "📝";
-    }
-
-    .notes-btn.active::after {
-        content: "✕";
-    }
-
-    .end-btn::after {
-        content: "🚪";
-    }
-
     .session-info h2 {
-        font-size: 0.9rem;
+        font-size: 0.8rem;
     }
 
     .status-badge {
-        font-size: 0.6rem;
+        font-size: 0.55rem;
         padding: 2px 6px;
-    }
-
-    button {
-        padding: 6px 10px;
-        font-size: 0.75rem;
     }
 
     .message-bubble {
         max-width: 95%;
+        padding: 10px 12px;
     }
 
     .messages-log {
@@ -777,12 +830,12 @@ button:disabled {
     .message-form input {
         padding: 0 12px;
         font-size: 0.85rem;
-        height: 42px;
+        height: 40px;
     }
 
     .message-form button {
         padding: 0 16px;
-        height: 42px;
+        height: 40px;
         font-size: 0.85rem;
     }
 
@@ -791,31 +844,35 @@ button:disabled {
         font-size: 0.85rem;
         padding: 0.75rem 1rem;
     }
+
+    .floating-actions {
+        padding: 0.5rem 0.25rem;
+    }
+
+    .action-btn {
+        font-size: 1rem;
+        min-width: 45px;
+        padding: 0.6rem 0.4rem;
+    }
 }
 
 /* Extra Small Mobile (landscape mode) */
 @media (max-height: 500px) and (orientation: landscape) {
     .chat-container {
-        grid-template-rows: 50px calc(100vh - 50px);
+        grid-template-rows: 45px 1fr 60px;
     }
 
     .chat-header {
-        min-height: 50px;
         padding: 0.5rem 1rem;
     }
 
     .session-info h2 {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
     }
 
     .status-badge {
         font-size: 0.6rem;
         padding: 2px 6px;
-    }
-
-    .header-actions button {
-        padding: 6px 10px;
-        font-size: 0.75rem;
     }
 
     .messages-log {
@@ -829,6 +886,10 @@ button:disabled {
     .message-form input,
     .message-form button {
         height: 36px;
+    }
+
+    .floating-actions {
+        padding: 0.5rem;
     }
 }
 
@@ -853,6 +914,14 @@ button:disabled {
     .message-bubble {
         max-width: 65%;
     }
+
+    .floating-actions {
+        padding: 1rem 2.5rem;
+    }
+
+    .action-btn {
+        max-width: 350px;
+    }
 }
 
 /* Extra Wide Screens (1920px+) */
@@ -867,5 +936,68 @@ button:disabled {
 
     .message-bubble {
         max-width: 60%;
+    }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+
+    .chat-header,
+    .floating-actions {
+        border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+        border-top: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .action-btn {
+        border: 2px solid currentColor;
+    }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+
+    .action-btn,
+    .message-form button {
+        min-height: 44px;
+    }
+
+    .message-bubble:hover {
+        transform: none;
+    }
+
+    .action-btn:active {
+        opacity: 0.8;
+    }
+}
+
+/* Print Styles */
+@media print {
+
+    .chat-header,
+    .floating-actions,
+    .notes-panel,
+    .message-form {
+        display: none;
+    }
+
+    .chat-container {
+        display: block;
+        height: auto;
+    }
+
+    .messages-log {
+        overflow: visible;
     }
 }

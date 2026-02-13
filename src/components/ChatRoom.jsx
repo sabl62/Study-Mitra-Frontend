@@ -117,10 +117,10 @@ const ChatRoom = () => {
     async (shouldNavigate = true) => {
       try {
         await api.post(`/sessions/${sessionId}/leave/`);
-        if (shouldNavigate) navigate("/dashboard");
+        if (shouldNavigate) navigate("/");
       } catch (err) {
         console.error("Error leaving session:", err);
-        if (shouldNavigate) navigate("/dashboard");
+        if (shouldNavigate) navigate("/");
       }
     },
     [sessionId, navigate],
@@ -272,7 +272,7 @@ const ChatRoom = () => {
 
     try {
       await api.post(`/sessions/${sessionId}/end_session/`);
-      navigate("/dashboard");
+      navigate("/");
     } catch (err) {
       setNotesError("Could not end session. Please try again.");
     }
@@ -285,40 +285,11 @@ const ChatRoom = () => {
 
   return (
     <div className={`chat-container ${showNotes ? "notes-open" : ""}`}>
+      {/* Minimalist Header - Just Session Title */}
       <header className="chat-header">
         <div className="session-info">
           <h2>{session.post?.title || session.topic || "Study Session"}</h2>
           <span className="status-badge">● Live</span>
-        </div>
-        <div className="header-actions">
-          <button
-            onClick={toggleNotesPanel}
-            className={`notes-btn ${showNotes ? "active" : ""}`}
-          >
-            📝 {showNotes ? "Hide Notes" : `Notes (${notes.length})`}
-          </button>
-          <button
-            onClick={handleGenerateNotes}
-            disabled={isGenerating || messages.length === 0}
-            className="notes-btn"
-          >
-            {isGenerating ? "⏳ Processing..." : "🤖 Generate Notes"}
-          </button>
-
-          {/* Conditional rendering based on creator status */}
-          {isCreator ? (
-            <button onClick={handleEndSession} className="end-btn">
-              End Session
-            </button>
-          ) : (
-            <button
-              onClick={() => handleLeaveSession(true)}
-              className="end-btn"
-              style={{ backgroundColor: "#dc3545" }}
-            >
-              Leave Session
-            </button>
-          )}
         </div>
       </header>
 
@@ -331,6 +302,7 @@ const ChatRoom = () => {
         </div>
       )}
 
+      {/* Main Chat Area */}
       <div className="chat-main-content">
         <main className="messages-log">
           {messages.length === 0 ? (
@@ -371,6 +343,46 @@ const ChatRoom = () => {
         </form>
       </div>
 
+      {/* Floating Action Bar at Bottom */}
+      <div className="floating-actions">
+        <button
+          onClick={toggleNotesPanel}
+          className={`action-btn notes-toggle ${showNotes ? "active" : ""}`}
+        >
+          <span className="action-btn-icon">{showNotes ? "✕" : "📝"}</span>
+          <span className="action-btn-text">
+            {showNotes ? "Hide Notes" : `Notes (${notes.length})`}
+          </span>
+        </button>
+
+        <button
+          onClick={handleGenerateNotes}
+          disabled={isGenerating || messages.length === 0}
+          className="action-btn generate"
+        >
+          <span className="action-btn-icon">{isGenerating ? "⏳" : "🤖"}</span>
+          <span className="action-btn-text">
+            {isGenerating ? "Processing..." : "Generate Notes"}
+          </span>
+        </button>
+
+        {isCreator ? (
+          <button onClick={handleEndSession} className="action-btn leave">
+            <span className="action-btn-icon">🛑</span>
+            <span className="action-btn-text">End Session</span>
+          </button>
+        ) : (
+          <button
+            onClick={() => handleLeaveSession(true)}
+            className="action-btn leave"
+          >
+            <span className="action-btn-icon">🚪</span>
+            <span className="action-btn-text">Leave</span>
+          </button>
+        )}
+      </div>
+
+      {/* Notes Panel */}
       <aside className={`notes-panel ${showNotes ? "active" : ""}`}>
         <div className="notes-panel-header">
           <h3>📚 Study Notes</h3>
@@ -379,10 +391,15 @@ const ChatRoom = () => {
               onClick={fetchNotes}
               className="notes-refresh-btn"
               disabled={isGenerating}
+              title="Refresh notes"
             >
               🔄
             </button>
-            <button onClick={toggleNotesPanel} className="notes-close-btn">
+            <button
+              onClick={toggleNotesPanel}
+              className="notes-close-btn"
+              title="Close notes"
+            >
               ✕
             </button>
           </div>
