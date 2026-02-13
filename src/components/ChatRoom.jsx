@@ -12,7 +12,19 @@ import {
 import api from "../services/api.js";
 import "./ChatRoom.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faList } from "@fortawesome/free-solid-svg-icons";
+import {
+  faRobot,
+  faPaperPlane,
+  faNoteSticky,
+  faArrowLeft,
+  faRectangleList,
+  faFlagCheckered,
+  faArrowsRotate,
+  faListUl,
+  faKey,
+  faMarker,
+  faBook,
+} from "@fortawesome/free-solid-svg-icons";
 const ChatRoom = () => {
   const { sessionId } = useParams();
   const navigate = useNavigate();
@@ -130,7 +142,7 @@ const ChatRoom = () => {
   // Cleanup/Leave on Unmount or Page Close
   useEffect(() => {
     const notifyLeave = () => {
-      const url = `${import.meta.env.VITE_API_URL || "http://localhost:8000/api"}/sessions/${sessionId}/leave/`;
+      const url = `${import.meta.env.VITE_API_URL}/sessions/${sessionId}/leave/`;
       // Use sendBeacon for more reliable delivery during page close
       navigator.sendBeacon(url);
     };
@@ -290,7 +302,6 @@ const ChatRoom = () => {
       <header className="chat-header">
         <div className="session-info">
           <h2>{session.post?.title || session.topic || "Study Session"}</h2>
-          <span className="status-badge">● Live</span>
         </div>
       </header>
 
@@ -308,7 +319,6 @@ const ChatRoom = () => {
         <main className="messages-log">
           {messages.length === 0 ? (
             <div className="messages-empty">
-              <div className="messages-empty-icon">💬</div>
               <p>No messages yet. Start the conversation!</p>
             </div>
           ) : (
@@ -339,7 +349,7 @@ const ChatRoom = () => {
             autoFocus
           />
           <button type="submit" disabled={!newMessage.trim() || isSending}>
-            {isSending ? "..." : "Send"}
+            {isSending ? "..." : <FontAwesomeIcon icon={faPaperPlane} />}
           </button>
         </form>
       </div>
@@ -350,7 +360,9 @@ const ChatRoom = () => {
           onClick={toggleNotesPanel}
           className={`action-btn notes-toggle ${showNotes ? "active" : ""}`}
         >
-          <span className="action-btn-icon">{showNotes ? "✕" : "📝"}</span>
+          <span className="action-btn-icon">
+            {showNotes ? "✕" : <FontAwesomeIcon icon={faNoteSticky} />}
+          </span>
           <span className="action-btn-text">
             {showNotes ? "Hide Notes" : `Notes (${notes.length})`}
           </span>
@@ -362,11 +374,7 @@ const ChatRoom = () => {
           className="action-btn generate"
         >
           <span className="action-btn-icon">
-            {isGenerating ? (
-              "..."
-            ) : (
-              <FontAwesomeIcon icon={faList} />
-            )}
+            {isGenerating ? "..." : <FontAwesomeIcon icon={faRobot} />}
           </span>
           <span className="action-btn-text">
             {isGenerating ? "Processing..." : "Generate Notes"}
@@ -375,7 +383,9 @@ const ChatRoom = () => {
 
         {isCreator ? (
           <button onClick={handleEndSession} className="action-btn leave">
-            <span className="action-btn-icon">🛑</span>
+            <span className="action-btn-icon">
+              <FontAwesomeIcon icon={faFlagCheckered} />
+            </span>
             <span className="action-btn-text">End Session</span>
           </button>
         ) : (
@@ -383,7 +393,9 @@ const ChatRoom = () => {
             onClick={() => handleLeaveSession(true)}
             className="action-btn leave"
           >
-            <span className="action-btn-icon">🚪</span>
+            <span className="action-btn-icon">
+              <FontAwesomeIcon icon={faArrowLeft} />
+            </span>
             <span className="action-btn-text">Leave</span>
           </button>
         )}
@@ -400,7 +412,7 @@ const ChatRoom = () => {
               disabled={isGenerating}
               title="Refresh notes"
             >
-              🔄
+              <FontAwesomeIcon icon={faArrowsRotate} />
             </button>
             <button
               onClick={toggleNotesPanel}
@@ -415,7 +427,9 @@ const ChatRoom = () => {
         <div className="notes-panel-content">
           {notes.length === 0 ? (
             <div className="notes-empty">
-              <div className="notes-empty-icon">📝</div>
+              <div className="notes-empty-icon">
+                <FontAwesomeIcon icon={faRectangleList} />
+              </div>
               <p>Click "Generate Notes" to summarize this chat.</p>
             </div>
           ) : (
@@ -427,7 +441,9 @@ const ChatRoom = () => {
 
                 {note.content && (
                   <section className="note-section">
-                    <h4 className="note-section-title">📄 Summary</h4>
+                    <h4 className="note-section-title">
+                      <FontAwesomeIcon icon={faListUl} /> Summary
+                    </h4>
                     <div className="note-section-content">
                       <p>{note.content}</p>
                     </div>
@@ -436,7 +452,9 @@ const ChatRoom = () => {
 
                 {note.key_concepts?.length > 0 && (
                   <section className="note-section">
-                    <h4 className="note-section-title">💡 Key Concepts</h4>
+                    <h4 className="note-section-title">
+                      <FontAwesomeIcon icon={faKey} /> Key Concepts
+                    </h4>
                     <div className="note-section-content">
                       <ul>
                         {note.key_concepts.map((c, i) => (
@@ -449,7 +467,9 @@ const ChatRoom = () => {
 
                 {note.definitions?.length > 0 && (
                   <section className="note-section">
-                    <h4 className="note-section-title">📖 Definitions</h4>
+                    <h4 className="note-section-title">
+                      <FontAwesomeIcon icon={faBook} /> Definitions
+                    </h4>
                     <div className="note-section-content">
                       <ul>
                         {note.definitions.map((def, i) => (
@@ -467,7 +487,9 @@ const ChatRoom = () => {
 
                 {note.study_tips?.length > 0 && (
                   <section className="note-section">
-                    <h4 className="note-section-title">✨ Study Tips</h4>
+                    <h4 className="note-section-title">
+                      <FontAwesomeIcon icon={faMarker} /> Study Tips
+                    </h4>
                     <div className="note-section-content">
                       <ul>
                         {note.study_tips.map((t, i) => (

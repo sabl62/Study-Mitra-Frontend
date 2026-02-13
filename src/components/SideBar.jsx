@@ -1,7 +1,8 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import "./Sidebar.css";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faLayerGroup, faCircleUser, faLinesLeaning, faPuzzlePiece} from "@fortawesome/free-solid-svg-icons";
 const Sidebar = () => {
   return (
     <aside className="sidebar">
@@ -12,7 +13,9 @@ const Sidebar = () => {
             isActive ? "nav-item active" : "nav-item"
           }
         >
-          <span className="icon">📚</span>
+          <span className="icon">
+            <FontAwesomeIcon icon={faLayerGroup} />
+          </span>
           <span className="label">Study Along</span>
         </NavLink>
 
@@ -22,7 +25,9 @@ const Sidebar = () => {
             isActive ? "nav-item active" : "nav-item"
           }
         >
-          <span className="icon">👤</span>
+          <span className="icon">
+            <FontAwesomeIcon icon={faCircleUser} />
+          </span>
           <span className="label">Profile</span>
         </NavLink>
 
@@ -32,7 +37,9 @@ const Sidebar = () => {
             isActive ? "nav-item active" : "nav-item"
           }
         >
-          <span className="icon">📝</span>
+          <span className="icon">
+            <FontAwesomeIcon icon={faLinesLeaning} />
+          </span>
           <span className="label">Exam Preparation</span>
         </NavLink>
 
@@ -42,7 +49,9 @@ const Sidebar = () => {
             isActive ? "nav-item active" : "nav-item"
           }
         >
-          <span className="icon">🎯</span>
+          <span className="icon">
+            <FontAwesomeIcon icon={faPuzzlePiece} />
+          </span>
           <span className="label">Micro Challenges</span>
         </NavLink>
       </div>

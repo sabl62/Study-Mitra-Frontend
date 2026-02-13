@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { profileAPI } from "../services/api";
 import api from "../services/api";
 import "./Profile.css";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFolderOpen, faUpload, faNotesMedical, faGlobe, faLock, faTrophy } from "@fortawesome/free-solid-svg-icons";
 const Profile = ({ username, isOwnProfile = true }) => {
 
   const [notePrivacy, setNotePrivacy] = useState("public");
@@ -323,7 +324,9 @@ const Profile = ({ username, isOwnProfile = true }) => {
                   className="upload-trigger-btn"
                   onClick={() => openUploadWidget("note")}
                 >
-                  <span className="btn-icon">📤</span>
+                  <span className="btn-icon">
+                    <FontAwesomeIcon icon={faUpload} />
+                  </span>
                   Upload Notes
                 </button>
               </div>
@@ -332,7 +335,9 @@ const Profile = ({ username, isOwnProfile = true }) => {
             <div className="notes-grid">
               {userNotes.length === 0 ? (
                 <div className="empty-state">
-                  <div className="empty-icon">📝</div>
+                  <div className="empty-icon">
+                    <FontAwesomeIcon icon={faNotesMedical} />
+                  </div>
                   <h3>No notes yet</h3>
                   <p>
                     {isOwnProfile
@@ -348,7 +353,15 @@ const Profile = ({ username, isOwnProfile = true }) => {
                       <span
                         className={`visibility-badge ${note.is_public ? "public" : "private"}`}
                       >
-                        {note.is_public ? "🌐 Public" : "🔒 Private"}
+                        {note.is_public ? (
+                          <>
+                            <FontAwesomeIcon icon={faGlobe} /> Public
+                          </>
+                        ) : (
+                          <>
+                            <FontAwesomeIcon icon={faLock} /> Private
+                          </>
+                        )}
                       </span>
                     </div>
                     <div
@@ -372,7 +385,9 @@ const Profile = ({ username, isOwnProfile = true }) => {
           <div className="portfolio-section">
             <div className="portfolio-header-box card-glass">
               <div className="ai-status">
-                <span className="sparkle">✨</span>
+                <span className="sparkle">
+                  <FontAwesomeIcon icon={faFolderOpen} />
+                </span>
                 <div className="ai-status-text">
                   <h3 className="ai-title">Portfolio Builder</h3>
                   <div className="skills-summary-container">
@@ -403,7 +418,9 @@ const Profile = ({ username, isOwnProfile = true }) => {
                   className="upload-trigger-btn primary"
                   onClick={() => openUploadWidget("certificate")}
                 >
-                  <span className="btn-icon">🏆</span>
+                  <span className="btn-icon">
+                    <FontAwesomeIcon icon={faTrophy} />
+                  </span>
                   Add Certificate
                 </button>
               )}
@@ -412,7 +429,9 @@ const Profile = ({ username, isOwnProfile = true }) => {
             <div className="certificates-grid">
               {certificates.length === 0 ? (
                 <div className="empty-state">
-                  <div className="empty-icon">🏆</div>
+                  <div className="empty-icon">
+                    <FontAwesomeIcon icon={faTrophy} />
+                  </div>
                   <h3>No certificates yet</h3>
                   <p>
                     {isOwnProfile

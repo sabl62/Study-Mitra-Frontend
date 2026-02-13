@@ -2,7 +2,8 @@ import React, { useState, useCallback, useMemo } from "react";
 import api from "../services/api";
 import ReactMarkdown from "react-markdown";
 import "./MicroChallenges.css";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowsToCircle } from "@fortawesome/free-solid-svg-icons";
 const MicroChallenges = () => {
   const [topic, setTopic] = useState("");
   const [loading, setLoading] = useState(false);
@@ -310,7 +311,9 @@ const MicroChallenges = () => {
             </div>
           ) : (
             <div className="empty-state">
-              <div className="empty-icon">🎯</div>
+              <div className="empty-icon">
+                <FontAwesomeIcon icon={faArrowsToCircle} />
+              </div>
               <h2 className="empty-title">Ready to Challenge Your Mind?</h2>
               <p className="empty-description">
                 Enter a subject above and select a challenge type to begin your
@@ -331,17 +334,17 @@ const MicroChallenges = () => {
               id="options-modal"
               onClick={(e) => e.stopPropagation()}
               style={{
-                position: 'fixed',
-                width: '100vw',
-                maxWidth: '100vw',
-                margin: '0',
-                padding: '0 10px',
-                boxSizing: 'border-box',
-                left: '0',
-                right: '0',
-                top: '80px',
-                borderRadius: '16px',
-                overflow: 'visible'
+                position: "fixed",
+                width: "100vw",
+                maxWidth: "100vw",
+                margin: "0",
+                padding: "0 10px",
+                boxSizing: "border-box",
+                left: "0",
+                right: "0",
+                top: "80px",
+                borderRadius: "16px",
+                overflow: "visible",
               }}
             >
               <div className="modal-header">
@@ -368,7 +371,6 @@ const MicroChallenges = () => {
                           {optionData.full}
                         </div>
                       </div>
-
                     </button>
                   ),
                 )}
