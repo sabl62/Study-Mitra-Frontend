@@ -13,7 +13,6 @@
 .lab-container {
   min-height: 100vh;
   min-height: 100dvh;
-  /* Dynamic viewport height for mobile */
   background: linear-gradient(135deg, #0a0e1a 0%, #1a1f35 100%);
   color: #f1f5f9;
   font-family:
@@ -22,12 +21,13 @@
     -apple-system,
     BlinkMacSystemFont,
     sans-serif;
-  padding: clamp(12px, 3vw, 20px);
+  padding: 0 clamp(12px, 3vw, 20px) !important;
   position: relative;
   overflow: hidden;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
 }
 
 /* === AMBIENT BACKGROUND === */
@@ -110,18 +110,17 @@
   min-width: min(95vw, 400px);
   position: relative;
   z-index: 10;
-  display: flex;
+  display: flex !important;
   flex-direction: column;
-  max-height: calc(100vh - 40px);
-  max-height: calc(100dvh - 40px);
-  min-height: calc(100vh - 40px);
-  min-height: calc(100dvh - 40px);
+  grid-template-rows: auto auto 1fr;
+  gap: 20px;
+  padding: 10px 0;
 }
 
 /* === HERO SECTION === */
 .hero-section {
   text-align: center;
-  margin-bottom: clamp(16px, 3vh, 20px);
+  margin-bottom: 0;
   animation: slideDown 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -141,7 +140,7 @@
   font-size: clamp(1.6rem, 5vw, 2.5rem);
   font-weight: 900;
   letter-spacing: 0.1em;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   background: linear-gradient(135deg, #ffffff 0%, #94a3b8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -161,7 +160,7 @@
   color: #94a3b8;
   font-weight: 300;
   letter-spacing: 0.05em;
-  margin-bottom: clamp(16px, 3vh, 20px);
+  margin-bottom: 5px;
   padding: 0 10px;
 }
 
@@ -171,6 +170,7 @@
   max-width: 500px;
   margin: 0 auto;
   width: 100%;
+  margin: 3vw auto 4vw;
 }
 
 .lab-input-field {
@@ -226,8 +226,8 @@
 .type-nav {
   display: flex;
   justify-content: center;
-  gap: clamp(8px, 2vw, 12px);
-  margin-bottom: clamp(16px, 3vh, 20px);
+  gap: 8px;
+  margin: 0;
   flex-wrap: wrap;
   animation: fadeIn 0.8s ease 0.2s both;
 }
@@ -247,24 +247,26 @@
   background: rgba(15, 23, 42, 0.5);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: clamp(8px, 1.5vw, 10px) clamp(16px, 3vw, 20px);
+  padding: 6px 12px;
   border-radius: 100px;
   color: #94a3b8;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
-  gap: clamp(6px, 1.5vw, 8px);
+  gap: 6px;
   font-weight: 600;
-  font-size: clamp(0.75rem, 1.8vw, 0.85rem);
+  font-size: 0.8rem;
   letter-spacing: 0.02em;
   overflow: hidden;
   white-space: nowrap;
 }
 
 .nav-pill:disabled {
-  opacity: 0.5;
+  opacity: 1;
   cursor: not-allowed;
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(15, 23, 42, 0.7);
 }
 
 .nav-pill:not(:disabled):hover {
@@ -283,7 +285,7 @@
 }
 
 .pill-icon {
-  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  font-size: 1rem;
   filter: grayscale(0.5);
   transition:
     filter 0.3s ease,
@@ -324,12 +326,12 @@
 
 /* === CANVAS AREA === */
 .canvas-area {
-  flex: 1;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: auto;
-  min-height: 0;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  overflow: visible;
+  min-height: 100px;
 }
 
 /* === OPTIMIZED LOADING ANIMATION === */
@@ -459,10 +461,9 @@
   box-shadow:
     0 20px 60px rgba(0, 0, 0, 0.4),
     0 0 0 1px rgba(255, 255, 255, 0.03);
-  overflow: hidden;
+  overflow: visible;
   width: 100%;
   max-width: 100%;
-  max-height: 100%;
   display: flex;
   flex-direction: column;
   min-width: 100%;
@@ -995,8 +996,13 @@
 /* === EMPTY STATE === */
 .empty-state {
   text-align: center;
-  padding: clamp(40px, 8vh, 60px) clamp(20px, 5vw, 30px);
+  padding: 20px;
   animation: fadeIn 0.6s ease;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .empty-icon {
@@ -1309,8 +1315,8 @@
 /* Mobile Landscape & Small Tablets (600px - 768px) */
 @media (max-width: 768px) {
   .lab-container {
-    padding: 16px;
-    padding-bottom: max(16px, env(safe-area-inset-bottom));
+    padding: 10px;
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
   }
 
   .main-interface {
@@ -1320,8 +1326,8 @@
   }
 
   .type-nav {
-    gap: 8px;
-    margin-bottom: 16px;
+    gap: 6px;
+    margin-bottom: 4px;
   }
 
   .question-section,
@@ -1461,8 +1467,8 @@
 /* Small Mobile (320px - 480px) */
 @media (max-width: 480px) {
   .lab-container {
-    padding: 10px;
-    padding-bottom: max(10px, env(safe-area-inset-bottom));
+    padding: 8px;
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
   }
 
   .main-interface {
@@ -1471,32 +1477,33 @@
   }
 
   .type-nav {
-    flex-direction: column;
-    align-items: stretch;
+    flex-direction: row;
+    align-items: center;
     gap: 6px;
+    margin-bottom: 4px;
   }
 
   .nav-pill {
     justify-content: center;
-    width: 100%;
+    width: auto;
   }
 
   .question-section,
   .options-section,
   .feedback-layout {
-    padding: 14px;
+    padding: 10px;
   }
 
   .question-section {
     max-height: 35vh;
     flex: 1;
-    min-height: 100px;
+    min-height: 80px;
   }
 
   .options-section {
     max-height: 55vh;
     flex: 2;
-    min-height: 140px;
+    min-height: 100px;
   }
 
   .quest-layout {
@@ -1504,8 +1511,8 @@
   }
 
   .option-card {
-    gap: 10px;
-    min-height: 56px;
+    gap: 8px;
+    min-height: 48px;
   }
 
   .option-arrow {
@@ -1602,35 +1609,35 @@
 /* Extra Small Mobile (< 320px) */
 @media (max-width: 320px) {
   .hero-section {
-    margin-bottom: 12px;
+    margin-bottom: 4px;
   }
 
   .type-nav {
-    margin-bottom: 12px;
+    margin-bottom: 4px;
   }
 
   .option-card {
-    padding: 12px 14px;
-    min-height: 56px;
+    padding: 8px 12px;
+    min-height: 48px;
   }
 }
 
 /* === LANDSCAPE ORIENTATION OPTIMIZATION === */
 @media (max-height: 600px) and (orientation: landscape) {
   .lab-container {
-    padding: 10px;
+    padding: 8px;
   }
 
   .hero-section {
-    margin-bottom: 10px;
+    margin-bottom: 2px;
   }
 
   .tagline {
-    margin-bottom: 10px;
+    margin-bottom: 2px;
   }
 
   .type-nav {
-    margin-bottom: 10px;
+    margin-bottom: 2px;
   }
 
   .question-section {
@@ -1893,4 +1900,33 @@
     padding: 6px 10px !important;
     font-size: 0.75rem !important;
   }
+}
+/* MicroChallenges.css Override */
+
+.lab-container {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+  min-height: calc(100vh - 80px) !important;
+  /* Adjust for navbar */
+}
+
+.main-interface {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+}
+
+/* This targets any section tags the HomePage CSS might have injected padding into */
+.lab-container section,
+.hero-section {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+.logo {
+  margin-top: 0 !important;
+  padding-top: 10px !important;
+  /* Control distance from navbar here */
 }

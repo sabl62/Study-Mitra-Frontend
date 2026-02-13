@@ -36,7 +36,7 @@ body {
 
 /* --- Navbar --- */
 .app-navbar {
-  height: clamp(60px, 10vh, 80px);
+  height: 60px;
   padding: 0 clamp(1rem, 3vw, 2rem);
   display: flex;
   align-items: center;
@@ -144,9 +144,7 @@ body {
 .main-layout {
   display: flex;
   flex: 1;
-  /* Takes up remaining height below navbar */
   overflow: hidden;
-  /* Contains the children */
   position: relative;
 }
 
@@ -163,7 +161,6 @@ body {
   background: #05070a;
   position: relative;
   -webkit-overflow-scrolling: touch;
-  /* Smooth scrolling on iOS */
 }
 
 /* ============================================
@@ -546,4 +543,20 @@ body {
 
 .app-navbar {
   isolation: isolate;
+}
+
+/* Force the specific MicroChallenges page to sit at the very top */
+.content-area {
+  padding-top: 0 !important;
+}
+
+.lab-container {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+.main-interface {
+  padding-top: 0 !important;
+  gap: 5px !important;
+  /* Tightens space between logo and nav pills */
 }

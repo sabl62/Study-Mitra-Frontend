@@ -36,16 +36,16 @@ html {
     color: #f8fafc;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-p,
-span,
-a,
-li {
+.homepage-root h1,
+.homepage-root h2,
+.homepage-root h3,
+.homepage-root h4,
+.homepage-root h5,
+.homepage-root h6,
+.homepage-root p,
+.homepage-root span,
+.homepage-root a,
+.homepage-root li {
     color: inherit;
 }
 
@@ -65,7 +65,7 @@ body {
 /* ============================================
    HERO SECTION
    ============================================ */
-.hero-section {
+.homepage-root .hero-section {
     position: relative;
     min-height: 100vh;
     display: flex;
@@ -354,7 +354,8 @@ body {
     margin-top: 0.25rem;
 }
 
-.scroll-indicator {
+/* .scroll-indicator {
+    margin-top: clamp(2rem, 4vh, 3rem);
     position: absolute;
     bottom: clamp(2rem, 4vh, 3rem);
     left: 50%;
@@ -365,7 +366,7 @@ body {
     gap: 0.5rem;
     opacity: 0.6;
     animation: bounce 2s ease-in-out infinite;
-}
+} */
 
 @keyframes bounce {
 
@@ -421,20 +422,22 @@ body {
 /* ============================================
    SECTIONS COMMON STYLES
    ============================================ */
-.features-section,
-.how-it-works-section,
-.testimonials-section,
-.cta-section {
+.homepage-root .features-section,
+.homepage-root .how-it-works-section,
+.homepage-root .testimonials-section,
+.homepage-root .cta-section {
     padding: clamp(4rem, 10vh, 8rem) clamp(1rem, 5vw, 2rem);
     position: relative;
 }
 
-.section-header {
+.homepage-root .section-header {
+    display: flex;
+    justify-content: center;
     text-align: center;
     margin-bottom: clamp(3rem, 6vh, 5rem);
 }
 
-.section-badge {
+.homepage-root.section-badge {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
@@ -448,7 +451,7 @@ body {
     margin-bottom: 1rem;
 }
 
-.section-title {
+.homepage-root .section-title {
     font-family: 'Space Grotesk', sans-serif;
     font-size: clamp(2rem, 5vw, 3rem);
     font-weight: 800;
@@ -457,7 +460,7 @@ body {
     color: var(--text-primary);
 }
 
-.section-subtitle {
+.homepage-root .section-subtitle {
     font-size: clamp(1rem, 2vw, 1.1rem);
     color: var(--text-secondary);
     max-width: 600px;
@@ -729,7 +732,7 @@ body {
 /* ============================================
    CTA SECTION
    ============================================ */
-.cta-section {
+.homepage-root .cta-section {
     background: radial-gradient(circle at center, rgba(99, 102, 241, 0.1), transparent);
 }
 
@@ -1040,7 +1043,7 @@ body {
 
 /* Very Small Mobile (320px - 480px) */
 @media (max-width: 480px) {
-    .hero-section {
+    .homepage-root.hero-section {
         padding: 3rem 1rem 2rem;
     }
 
@@ -1080,7 +1083,7 @@ body {
 @media print {
 
     .scroll-indicator,
-    .cta-section,
+    .homepage-root .cta-section,
     .social-links {
         display: none;
     }
