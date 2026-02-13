@@ -11,7 +11,8 @@ import {
 } from "firebase/firestore";
 import api from "../services/api.js";
 import "./ChatRoom.css";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faList } from "@fortawesome/free-solid-svg-icons";
 const ChatRoom = () => {
   const { sessionId } = useParams();
   const navigate = useNavigate();
@@ -360,7 +361,13 @@ const ChatRoom = () => {
           disabled={isGenerating || messages.length === 0}
           className="action-btn generate"
         >
-          <span className="action-btn-icon">{isGenerating ? "⏳" : "🤖"}</span>
+          <span className="action-btn-icon">
+            {isGenerating ? (
+              "..."
+            ) : (
+              <FontAwesomeIcon icon={faList} />
+            )}
+          </span>
           <span className="action-btn-text">
             {isGenerating ? "Processing..." : "Generate Notes"}
           </span>
