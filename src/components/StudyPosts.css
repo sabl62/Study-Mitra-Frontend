@@ -393,6 +393,7 @@ body {
   z-index: 1000;
   padding: 1rem;
   animation: fadeIn 0.2s ease;
+  overflow-y: auto;
 }
 
 @keyframes fadeIn {
