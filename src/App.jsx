@@ -7,14 +7,15 @@ import {
   Link,
 } from "react-router-dom";
 
-import MicroChallenges from "./components/MicroChallenges";
-import StudyPosts from "./components/StudyPosts";
-import ChatRoom from "./components/ChatRoom";
-import Login from "./components/Login";
-import Signup from "./components/SignUp";
-import Sidebar from "./components/SideBar";
-import Profile from "./components/Profile";
+import MicroChallenges from "./components/MicroChallenges.jsx";
+import StudyPosts from "./components/StudyPosts.jsx";
+import ChatRoom from "./components/ChatRoom.jsx";
+import Login from "./components/Login.jsx";
+import Signup from "./components/SignUp.jsx";
+import Sidebar from "./components/SideBar.jsx";
+import Profile from "./components/Profile.jsx";
 import ExamPrep from "./components/ExamPrep.jsx";
+import HomePage from "./components/HomePage.jsx";
 // Auth Context
 import { useAuth, AuthProvider } from "./context/AuthContext.jsx";
 // API
@@ -129,6 +130,16 @@ function AppContent() {
 
           <main className="content-area">
             <Routes>
+              <Route
+                path="/"
+                element={
+                  isLoggedIn? (
+                    <StudyPosts />)
+                    :(
+                    <HomePage />
+                  )
+                }
+              />
               {/* --- PUBLIC ROUTES --- */}
               <Route
                 path="/login"
@@ -140,14 +151,14 @@ function AppContent() {
               />
 
               {/* --- PROTECTED ROUTES --- */}
-              <Route
-                path="/"
+              {/* <Route
+                path="/study-along"
                 element={
                   <ProtectedRoute>
                     <StudyPosts />
                   </ProtectedRoute>
                 }
-              />
+              /> */}
               <Route
                 path="/profile"
                 element={
